@@ -1,0 +1,28 @@
+{
+  description = "Mapper without the noise";
+
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  };
+
+  outputs = {
+    self,
+    nixpkgs,
+  }: let
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
+  in {
+    formatter.${system} = pkgs.alejandra;
+
+    devShells.${system}.default = pkgs.mkShell {
+      buildInputs = with pkgs; [
+        rye
+      ];
+
+      shellHook = ''
+        [ -d .venv ] || rye sync
+        . .venv/bin/activate
+      '';
+    };
+  };
+}
