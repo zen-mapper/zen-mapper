@@ -15,7 +15,21 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "black>=23.9.1",
+    "ruff>=0.0.292",
+    "pytest>=7.4.2",
+    "hypothesis>=6.87.4",
+]
+
+[tool.rye.scripts]
+format = { chain = ["format:black", "format:ruff"]}
+"format:black" = "black ."
+"format:ruff" = "ruff check src --fix"
+
+[tool.ruff]
+select = ["E", "F", "I", "UP"]
+ignore = []
 
 [tool.hatch.metadata]
 allow-direct-references = true
