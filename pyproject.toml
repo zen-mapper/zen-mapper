@@ -33,3 +33,7 @@ ignore = []
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zen_mapper"]
+exclude = ["src/**/test*.py"]
