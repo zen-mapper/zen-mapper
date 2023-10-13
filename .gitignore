@@ -1,3 +1,6 @@
+# Nix files
+result
+
 # Development files
 .direnv
 .envrc

@@ -14,6 +14,18 @@
   in {
     formatter.${system} = pkgs.alejandra;
 
+    packages.${system}.default = pkgs.python3Packages.buildPythonPackage {
+      pname = "zen-mapper";
+      version = "0.1.0";
+      format = "pyproject";
+
+      src = ./.;
+
+      nativeBuildInputs = [
+        pkgs.hatch
+      ];
+    };
+
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = with pkgs; [
         rye
