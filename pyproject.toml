@@ -26,6 +26,7 @@ dev-dependencies = [
 format = { chain = ["format:black", "format:ruff"]}
 "format:black" = "black ."
 "format:ruff" = "ruff check src --fix"
+test = "pytest ."
 
 [tool.ruff]
 select = ["E", "F", "I", "UP"]
