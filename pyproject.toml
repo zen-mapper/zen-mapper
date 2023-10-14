@@ -5,7 +5,9 @@ description = "Mapper without the noise"
 authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
 ]
-dependencies = []
+dependencies = [
+    "numpy>=1.26.0",
+]
 readme = "README.md"
 requires-python = ">= 3.10"
 
@@ -19,7 +21,7 @@ dev-dependencies = [
     "black>=23.9.1",
     "ruff>=0.0.292",
     "pytest>=7.4.2",
-    "hypothesis>=6.87.4",
+    "hypothesis[numpy]>=6.87.4",
 ]
 
 [tool.rye.scripts]
