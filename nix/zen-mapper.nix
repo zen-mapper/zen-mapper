@@ -1,8 +1,14 @@
 {
+  # Build
   buildPythonPackage,
-  numpy,
   hatchling,
+
+  # Dependencies
+  numpy,
+
+  # Check
   pytest,
+  scikit-learn,
   hypothesis,
 }:
 buildPythonPackage {
@@ -23,6 +29,7 @@ buildPythonPackage {
   nativeCheckInputs = [
     pytest
     hypothesis
+    scikit-learn
   ];
 
   checkPhase = ''
