@@ -23,8 +23,7 @@
       ];
 
       shellHook = ''
-        [ -d .venv ] || rye sync
-        . .venv/bin/activate
+        [ -d .venv ] && .venv/bin/activate
       '';
     };
   };
