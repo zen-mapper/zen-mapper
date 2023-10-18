@@ -28,12 +28,16 @@ dev-dependencies = [
 ]
 
 [tool.rye.scripts]
+docs = "sphinx-apidoc -f -o docs/source src '**/test_*.py' "
+
 lint = { chain = ["lint:black", "lint:ruff"] }
 "lint:black" = "black --check ."
 "lint:ruff" = "ruff check src"
+
 format = { chain = ["format:black", "format:ruff"]}
 "format:black" = "black ."
 "format:ruff" = "ruff check src --fix"
+
 test = "pytest ."
 
 [tool.ruff]
