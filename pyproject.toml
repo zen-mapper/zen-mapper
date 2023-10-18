@@ -1,6 +1,6 @@
 [project]
 name = "zen-mapper"
-version = "0.1.0"
+version = "0.1.1"
 description = "Mapper without the noise"
 authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
