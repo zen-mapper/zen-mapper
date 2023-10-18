@@ -15,7 +15,11 @@ release = "0.1.1"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.napoleon", "sphinx.ext.intersphinx"]
+extensions = [
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "myst_parser",
+]
 
 templates_path = ["_templates"]
 exclude_patterns = []
