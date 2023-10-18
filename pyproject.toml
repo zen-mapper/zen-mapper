@@ -6,7 +6,7 @@ authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
 ]
 dependencies = [
-    "numpy>=1.26.0",
+    "numpy>=1.25.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
