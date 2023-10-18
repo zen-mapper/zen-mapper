@@ -5,26 +5,22 @@ import numpy as np
 
 
 class Clusterer(Protocol):
+    """A function which partitions a data set
+
+    In particular it is a function which takes a data array and returns an
+    iterator of arrays of indices into that array which are disjoint.
+    """
+
     def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
         ...
 
 
 class sk_learn:
-    """A wrapper for sk-learn clusterers"""
+    """Wraps an sk-learn clusterer for use with zen-mapper"""
 
     def __init__(self, clusterer):
-        """Wraps an sk-learn clusterer for use with zen-mapper
-
-        Parameters
-        ----------
-        clusterer:
-            A clusterer implementing the sk-learn api
-        Returns
-        -------
-        clusterer:
-            A clusterer implementing the zen-mapper api
-        """
         self.clusterer = clusterer
+        """A clusterer implementing the sk-learn api"""
 
     def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
         if len(data) == 0:
