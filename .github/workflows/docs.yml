@@ -1,18 +1,20 @@
-name: Lint and run test suite
+name: Docs
 
 on:
   push:
     branches:
       - main
-    tags:
-      - "v*.*.*"
-    pull_request:
-      branches:
-        - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  check_zen_mapper:
-    name: Check zen-mapper
+  build_docs:
+    name: Document zen mapper
     runs-on: ubuntu-22.04
     steps:
       # Configure the runner
@@ -56,13 +58,22 @@ jobs:
           nix develop --command \
             rye sync --no-lock
 
-      # Actually run tests
-      - name: Check formatting
+      - name: Generate autodocs
         run: |
           nix develop --command \
-            rye run lint
+            rye run docs
 
-      - name: Run tests
+      - name: Build html docs
         run: |
-          nix develop --command \
-            rye run test
+          . .venv/bin/activate
+          cd docs
+          make html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./docs/build/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
