@@ -1,0 +1,63 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  lint:
+    name: Lint zen mapper
+    runs-on: ubuntu-22.04
+    steps:
+      # Configure the runner
+      - name: git checkout
+        uses: actions/checkout@v3
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check Nixpkgs inputs
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          fail-mode: true
+
+      # Configure python env
+      - name: Restore cached lock files
+        id: lock-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            requirements.lock
+            requirements-dev.lock
+          key: ${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+
+      - name: Generate lock files
+        if: steps.lock-cache.outputs.cache-hit != 'true'
+        run: |
+          nix develop --command \
+            rye lock
+
+      - name: Restore cached venv
+        id: venv-cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .venv
+          key: ${{ runner.os }}-${{ hashFiles('*.lock') }}
+
+      - name: Install python dependencies
+        if: steps.venv-cache.outputs.cache-hit != 'true'
+        run: |
+          nix develop --command \
+            rye sync --no-lock
+
+      # Lint
+      - name: Check formatting
+        run: |
+          nix develop --command \
+            rye run lint
