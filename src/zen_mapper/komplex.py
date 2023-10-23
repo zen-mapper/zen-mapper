@@ -38,6 +38,10 @@ class Simplex(tuple[int, ...]):
         for i in range(1, len(self) + 1):
             yield from map(Simplex, combinations(self, i))
 
+    @property
+    def vertices(self: Self) -> Iterable[int]:
+        yield from self
+
 
 class Komplex:
     def __init__(self: Self, simplices: Iterable[Simplex] | None = None) -> None:
@@ -61,6 +65,11 @@ class Komplex:
 
     def __iter__(self: Self):
         yield from self._simplices
+
+    @property
+    def vertices(self: Self) -> Iterable[int]:
+        for simplex in self[0]:
+            yield from simplex.vertices
 
 
 def compute_nerve(
