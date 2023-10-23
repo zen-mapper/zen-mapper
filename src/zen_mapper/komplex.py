@@ -14,6 +14,13 @@ class Simplex(tuple[int, ...]):
 
     @property
     def dim(self: Self) -> int:
+        """The dimension of the simplex
+
+        The dimension of a simplex is defined to be one less than the number of
+        elements in the simplex. Thus a 0-simplex (a vertex) is comprised of a
+        single point, a 1-simplex (an edge) is comprised of two points, and so
+        on.
+        """
         return len(self) - 1
 
     @property
