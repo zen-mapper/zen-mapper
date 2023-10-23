@@ -17,7 +17,17 @@ class Simplex(tuple[int, ...]):
         return len(self) - 1
 
     @property
-    def faces(self: Self):
+    def faces(self: Self) -> Iterable[Self]:
+        """All the faces of a simplex
+
+        A simplex θ is a face of τ if and only if θ ⊆ τ. Note that as τ ⊆ τ
+        that τ is a face of τ!
+
+        Yields
+        ------
+        simplex
+            a face of the simplex
+        """
         for i in range(1, len(self) + 1):
             yield from map(Simplex, combinations(self, i))
 
