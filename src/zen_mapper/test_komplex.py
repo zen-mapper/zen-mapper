@@ -57,8 +57,8 @@ def test_faces(v):
     for face in faces:
         counter[face.dim] += 1
 
-    for dim, count in counter.items():
-        assert count == comb(s.dim + 1, dim + 1)
+    for dim in range(0, s.dim + 1):
+        assert counter[dim] == comb(s.dim + 1, dim + 1)
 
 
 def test_candidates():
