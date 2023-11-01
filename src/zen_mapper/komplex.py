@@ -1,6 +1,9 @@
+import logging
 from collections.abc import Iterable
 from itertools import chain, combinations, count
 from typing import Self
+
+logger = logging.getLogger("zen_mapper")
 
 
 class Simplex(tuple[int, ...]):
@@ -97,8 +100,10 @@ def compute_nerve(
     """
     assert dim is None or dim >= 0, "dim must be at least 0"
     assert min_intersection >= 1, "min_intersection must be at least 1"
+    logger.info("Computing the nerve")
     n = len(nodes)
     komplex = Komplex(Simplex((i,)) for i in range(n))
+    logger.info("Found %d 0-complexes", n)
 
     if dim == 0:
         return komplex
@@ -109,6 +114,7 @@ def compute_nerve(
 
     prev = set(Simplex((i,)) for i in range(n))
     for current_dim in dimensions:
+        logger.info("Searching for %d-complexes", current_dim)
         if not prev:
             # No k-simplices were found, there are no k+1 simplices either
             break
@@ -121,6 +127,7 @@ def compute_nerve(
             if len(frozenset.intersection(*elements)) >= min_intersection:
                 prev.add(candidate)
                 komplex.add(candidate)
+        logger.info("Found %d %d-complexes", len(prev), current_dim)
 
     return komplex
 
