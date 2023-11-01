@@ -12,3 +12,11 @@ def test_sk_learn():
     clusters = list(clusterer(data))
     assert len(clusters) == 1
     assert len(clusters[0]) == len(data)
+
+
+def test_empty_dtype():
+    db = DBSCAN(eps=0.1, min_samples=2)
+    clusterer = sk_learn(db)
+    clusters = list(clusterer(np.array([])))
+    for cluster in clusters:
+        assert cluster.dtype == "int64"

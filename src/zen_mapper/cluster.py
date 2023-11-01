@@ -24,7 +24,7 @@ class sk_learn:
 
     def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
         if len(data) == 0:
-            yield np.array([])
+            yield np.array([], dtype=int)
             return
 
         labels = np.unique(self.clusterer.fit_predict(data))
