@@ -1,7 +1,10 @@
+import logging
 from collections.abc import Iterator
 from typing import Protocol
 
 import numpy as np
+
+logger = logging.getLogger("zen_mapper")
 
 
 class Clusterer(Protocol):
@@ -28,6 +31,13 @@ class sk_learn:
             return
 
         labels = np.unique(self.clusterer.fit_predict(data))
+
+        if -1 in labels:
+            logger.warn(
+                "the clusterer has labeled some points as noise, "
+                "they are being discarded"
+            )
+
         labels = labels[
             labels != -1
         ]  # -1 indicates noise, we don't do anything with it
