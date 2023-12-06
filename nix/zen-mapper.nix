@@ -13,7 +13,7 @@
 }:
 buildPythonPackage {
   pname = "zen-mapper";
-  version = "0.1.2";
+  version = "0.1.3";
   format = "pyproject";
 
   src = ../.;
