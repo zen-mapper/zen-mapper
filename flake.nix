@@ -28,6 +28,7 @@
     devShells.${system}.default = pkgs.mkShell {
       venvDir = ".venv";
       buildInputs = [
+        pkgs.hatch
         pkgs.just
         pkgs.ruff
         python
