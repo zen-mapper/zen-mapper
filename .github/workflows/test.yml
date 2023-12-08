@@ -26,38 +26,8 @@ jobs:
         with:
           fail-mode: true
 
-      # Configure python env
-      - name: Restore cached lock files
-        id: lock-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            requirements.lock
-            requirements-dev.lock
-          key: ${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
-
-      - name: Generate lock files
-        if: steps.lock-cache.outputs.cache-hit != 'true'
-        run: |
-          nix develop --command \
-            rye lock
-
-      - name: Restore cached venv
-        id: venv-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            .venv
-          key: ${{ runner.os }}-${{ hashFiles('*.lock') }}
-
-      - name: Install python dependencies
-        if: steps.venv-cache.outputs.cache-hit != 'true'
-        run: |
-          nix develop --command \
-            rye sync --no-lock
-
       # Test
       - name: Run tests
         run: |
           nix develop --command \
-            rye run test
+            just test
