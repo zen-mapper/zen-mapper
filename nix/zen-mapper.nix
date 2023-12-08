@@ -2,10 +2,8 @@
   # Build
   buildPythonPackage,
   hatchling,
-
   # Dependencies
   numpy,
-
   # Check
   pytest,
   scikit-learn,

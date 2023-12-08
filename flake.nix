@@ -11,19 +11,33 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    python = pkgs.python311.withPackages (ps: [
+      ps.numpy
+      ps.pytest
+      ps.scikit-learn
+      ps.hypothesis
+      ps.networkx
+      ps.sphinx
+      ps.myst-parser
+    ]);
   in {
     formatter.${system} = pkgs.alejandra;
 
     packages.${system}.default = pkgs.python311Packages.callPackage ./nix/zen-mapper.nix {};
 
     devShells.${system}.default = pkgs.mkShell {
-      buildInputs = with pkgs; [
-        act
-        rye
+      venvDir = ".venv";
+      buildInputs = [
+        pkgs.just
+        pkgs.ruff
+        python
       ];
 
       shellHook = ''
-        [ -d .venv ] && .venv/bin/activate
+        if [ -z "$PYTHONPATH" ]
+        then export PYTHONPATH=$(realpath ./src)
+        else export PYTHONPATH=$PYTHONPATH:$(realpath ./src)
+        fi
       '';
     };
   };
