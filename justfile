@@ -27,3 +27,9 @@ docs:
 # Build the package
 build:
 	hatch build
+
+# Clean up the working directory
+clean:
+	rm -rf dist/ docs/build/ result
+	find src/ -type f -name "*.pyc" -delete
+	find src/ -type d -name "__pycache__" -delete
