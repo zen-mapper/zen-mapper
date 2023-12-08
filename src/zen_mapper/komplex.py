@@ -115,9 +115,6 @@ def compute_nerve(
     prev = set(Simplex((i,)) for i in range(n))
     for current_dim in dimensions:
         logger.info("Searching for %d-complexes", current_dim)
-        if not prev:
-            # No k-simplices were found, there are no k+1 simplices either
-            break
 
         candidates = _get_candidates(prev, current_dim)
         prev = set()
@@ -127,7 +124,12 @@ def compute_nerve(
             if len(frozenset.intersection(*elements)) >= min_intersection:
                 prev.add(candidate)
                 komplex.add(candidate)
+
         logger.info("Found %d %d-complexes", len(prev), current_dim)
+
+        if not prev:
+            # No k-simplices were found, there are no k+1 simplices either
+            break
 
     return komplex
 

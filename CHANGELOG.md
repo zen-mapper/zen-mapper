@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed unused `.python-version` file
 
+### Fixed
+
+- Removed spurious logging about looking for simplices
+
 ## [0.1.3] - 2023-12-05
 
 ### Fixed
