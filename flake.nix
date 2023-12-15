@@ -25,6 +25,23 @@
 
     packages.${system}.default = pkgs.python311Packages.callPackage ./nix/zen-mapper.nix {};
 
+    overlays.default = final: prev: {
+      pythonPackagesExtensions =
+        (prev.pythonPackagesExtensions or [])
+        ++ [
+          (
+            python-final: python-prev: {
+              zen-mapper = python-final.callPackage ./nix/zen-mapper.nix {};
+            }
+          )
+        ];
+    };
+
+    templates.default = {
+      path = ./templates/minimal;
+      description = "Minimal example of using zen-mapper with flakes";
+    };
+
     devShells.${system}.default = pkgs.mkShell {
       venvDir = ".venv";
       buildInputs = [

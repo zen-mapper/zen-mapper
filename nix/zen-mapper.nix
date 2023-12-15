@@ -8,6 +8,7 @@
   pytest,
   scikit-learn,
   hypothesis,
+  networkx,
 }:
 buildPythonPackage {
   pname = "zen-mapper";
@@ -28,6 +29,7 @@ buildPythonPackage {
     pytest
     hypothesis
     scikit-learn
+    networkx
   ];
 
   checkPhase = ''

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- overlay for nixpkgs
+- template flake
+
 ### Removed
 
 - Removed unused `.python-version` file
