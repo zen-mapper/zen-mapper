@@ -16,8 +16,8 @@ jobs:
         uses: DeterminateSystems/update-flake-lock@main
         with:
           pr-title: "Update flake.lock"
+          commit-msg: "chore: bump flake.lock"
           pr-labels: |
             dependencies
             automated
-          git-commit-message: "chore: bump flake.lock"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
