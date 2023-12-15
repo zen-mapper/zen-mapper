@@ -7,6 +7,8 @@ on:
 jobs:
   lockfile:
     runs-on: ubuntu-latest
+    env:
+      GIT_COMMIT_MESSAGE: "chore: bump flake.lock"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,5 +21,4 @@ jobs:
           pr-labels: |
             dependencies
             automated
-          git-commit-message: "chore: bump flake.lock"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
