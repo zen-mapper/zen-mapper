@@ -6,3 +6,7 @@
 > Antoine de Saint-Exupéry
 
 Zen mapper is a minimal implementation of the TDA algorithm Mapper
+
+# Installation
+
+There are two methods for installing Zen Mapper. The first

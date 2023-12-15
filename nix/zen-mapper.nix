@@ -1,6 +1,7 @@
 {
-  # Build
   buildPythonPackage,
+  pythonOlder,
+  # Build
   hatchling,
   # Dependencies
   numpy,
@@ -14,6 +15,8 @@ buildPythonPackage {
   pname = "zen-mapper";
   version = "0.1.3";
   format = "pyproject";
+
+  disabled = pythonOlder "3.11";
 
   src = ../.;
 

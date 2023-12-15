@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - overlay for nixpkgs
 - template flake
 
+### Change
+
+- Mark python 3.11 as the minimum version. It already was the minimum version, it was just mislabeled.
+
 ### Removed
 
 - Removed unused `.python-version` file
