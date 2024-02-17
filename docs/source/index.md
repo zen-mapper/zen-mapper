@@ -14,7 +14,7 @@ analyses.
 > Antoine de Saint-Exupéry
 
 ```{contents} Table of Contents
-:maxdepth: 2
+:depth: 2
 ```
 
 ## Things left to do
@@ -46,10 +46,9 @@ Preference was given to write the most obvious implementations which would work
 for this initial pre-release. This was to make sure everything was working
 correctly. There is plenty of room left for some pretty trivial optimizations.
 
+---
 
 ## Indices
-
----
 
 - {ref}`genindex`
 - {ref}`modindex`
