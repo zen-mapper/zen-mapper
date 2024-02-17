@@ -9,7 +9,7 @@
 project = "zen mapper"
 copyright = "2023, Ethan Rooke"
 author = "Ethan Rooke"
-release = "0.1.3"
+release = "0.1.4"
 
 
 # -- General configuration ---------------------------------------------------
