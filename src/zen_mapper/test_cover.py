@@ -104,6 +104,15 @@ def test_grid_array_steps(args):
     floats(min_value=0.1, max_value=0.5),
 )
 def test_width_balanced(data, n, gain):
+    """Ensure that a width balanced cover covers the entire dataset"""
     cover_scheme = Width_Balanced_Cover(n, gain)
+    covered_data = reduce(lambda acc, new: acc.union(new), cover_scheme(data), set())
+    assert len(data) == len(covered_data)
+
+
+def test_width_balanced_int():
+    """Ensure that width balanced covers handle integer data gracefully"""
+    data = np.arange(100, dtype=int)
+    cover_scheme = Width_Balanced_Cover(3, 0.4)
     covered_data = reduce(lambda acc, new: acc.union(new), cover_scheme(data), set())
     assert len(data) == len(covered_data)

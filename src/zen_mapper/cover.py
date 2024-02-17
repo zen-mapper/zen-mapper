@@ -107,8 +107,8 @@ class Width_Balanced_Cover:
         if len(data.shape) == 1:
             data = data.reshape(-1, 1)
 
-        upper_bound = np.max(data, axis=0)
-        lower_bound = np.min(data, axis=0)
+        upper_bound = np.max(data, axis=0).astype(float)
+        lower_bound = np.min(data, axis=0).astype(float)
 
         width = (upper_bound - lower_bound) / (
             self.n_elements - (self.n_elements - 1) * self.percent_overlap
