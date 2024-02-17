@@ -38,7 +38,7 @@
     };
 
     templates.default = {
-      path = ./templates/minimal;
+      path = ./nix/templates/minimal;
       description = "Minimal example of using zen-mapper with flakes";
     };
 
