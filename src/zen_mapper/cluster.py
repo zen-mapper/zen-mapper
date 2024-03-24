@@ -14,8 +14,7 @@ class Clusterer(Protocol):
     iterator of arrays of indices into that array which are disjoint.
     """
 
-    def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
-        ...
+    def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]: ...
 
 
 class sk_learn:

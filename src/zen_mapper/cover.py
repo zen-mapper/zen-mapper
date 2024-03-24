@@ -8,16 +8,13 @@ logger = logging.getLogger("zen_mapper")
 
 
 class Cover(Protocol):
-    def __len__(self: Self) -> int:
-        ...
+    def __len__(self: Self) -> int: ...
 
-    def __iter__(self: Self) -> Iterator[np.ndarray]:
-        ...
+    def __iter__(self: Self) -> Iterator[np.ndarray]: ...
 
 
 class CoverScheme(Protocol):
-    def __call__(self: Self, data: np.ndarray) -> Cover:
-        ...
+    def __call__(self: Self, data: np.ndarray) -> Cover: ...
 
 
 def rectangular_cover(centers, widths, data, tol=1e-9):
