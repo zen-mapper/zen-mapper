@@ -20,7 +20,7 @@ requires-python = ">= 3.11"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
 ignore = []
 
