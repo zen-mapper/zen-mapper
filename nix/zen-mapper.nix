@@ -14,7 +14,7 @@
 buildPythonPackage {
   pname = "zen-mapper";
   version = "0.1.4";
-  format = "pyproject";
+  pyproject = true;
 
   disabled = pythonOlder "3.11";
 
