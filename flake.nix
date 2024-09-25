@@ -11,7 +11,7 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    python = pkgs.python311.withPackages (ps: [
+    python = pkgs.python3.withPackages (ps: [
       ps.numpy
       ps.pytest
       ps.scikit-learn
@@ -23,7 +23,7 @@
   in {
     formatter.${system} = pkgs.alejandra;
 
-    packages.${system}.default = pkgs.python311Packages.callPackage ./nix/zen-mapper.nix {};
+    packages.${system}.default = pkgs.python3Packages.callPackage ./nix/zen-mapper.nix {};
 
     overlays.default = final: prev: {
       pythonPackagesExtensions =
