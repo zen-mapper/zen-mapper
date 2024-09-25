@@ -6,7 +6,7 @@
   # Dependencies
   numpy,
   # Check
-  pytest,
+  pytestCheckHook,
   scikit-learn,
   hypothesis,
   networkx,
@@ -29,17 +29,9 @@ buildPythonPackage {
   ];
 
   nativeCheckInputs = [
-    pytest
+    pytestCheckHook
     hypothesis
     scikit-learn
     networkx
   ];
-
-  checkPhase = ''
-    runHook preCheck
-
-    pytest
-
-    runHook postCheck
-  '';
 }
