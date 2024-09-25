@@ -24,7 +24,7 @@ buildPythonPackage {
     numpy
   ];
 
-  nativeBuildInputs = [
+  build-system = [
     hatchling
   ];
 
