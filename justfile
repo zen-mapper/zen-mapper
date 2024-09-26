@@ -6,14 +6,14 @@ alias fmt := format
 
 # Run code formatters
 format:
-	ruff format src
-	ruff check src --fix
+	ruff format .
+	ruff check . --fix
 	nix fmt
 
 # Check for style issues
 lint:
-	ruff format --check src
-	ruff check src
+	ruff format --check .
+	ruff check .
 
 # Run the test suite
 test:
