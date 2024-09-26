@@ -21,7 +21,6 @@ test:
 
 # Build the docs
 docs:
-	sphinx-apidoc -f -o docs/source src '**/test_*.py'
 	cd docs && make html
 
 # Build the package

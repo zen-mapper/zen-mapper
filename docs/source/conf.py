@@ -20,6 +20,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "myst_parser",
+    "autoapi.extension",
 ]
 
 templates_path = ["_templates"]
@@ -37,15 +38,18 @@ intersphinx_mapping = {
 
 html_theme = "alabaster"
 html_theme_options = {
-        'github_user': 'zen-mapper',
-        'github_repo': 'zen-mapper',
+    "github_user": "zen-mapper",
+    "github_repo": "zen-mapper",
 }
 html_static_path = ["_static"]
 html_sidebars = {
-        '**': [
-            'about.html',
-            'searchfield.html',
-            'navigation.html',
-        ]
+    "**": [
+        "about.html",
+        "searchfield.html",
+        "navigation.html",
+    ]
 }
 
+# -- Options for Api documentation --------------------------------------------
+autoapi_dirs = ["../../src/zen_mapper"]
+autoapi_ignore = ["**/test*.py"]

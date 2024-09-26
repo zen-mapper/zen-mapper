@@ -48,8 +48,7 @@ correctly. There is plenty of room left for some pretty trivial optimizations.
 
 ---
 
-## Indices
-
-- {ref}`genindex`
-- {ref}`modindex`
-- {ref}`search`
+```{toctree}
+:maxdepth: 2
+autoapi/index
+```

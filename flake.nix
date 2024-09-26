@@ -18,6 +18,7 @@
       ps.hypothesis
       ps.networkx
       ps.sphinx
+      ps.sphinx-autoapi
       ps.myst-parser
     ]);
   in {
