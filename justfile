@@ -21,7 +21,7 @@ test:
 
 # Build the docs
 docs:
-	cd docs && make html
+	cd docs && make dirhtml
 
 # Build the package
 build:
