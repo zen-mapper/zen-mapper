@@ -50,5 +50,6 @@ correctly. There is plenty of room left for some pretty trivial optimizations.
 
 ```{toctree}
 :maxdepth: 2
+examples/index
 autoapi/index
 ```

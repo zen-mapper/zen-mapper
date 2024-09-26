@@ -21,6 +21,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "myst_parser",
     "autoapi.extension",
+    "sphinx_gallery.gen_gallery",
 ]
 
 templates_path = ["_templates"]
@@ -53,3 +54,10 @@ html_sidebars = {
 # -- Options for Api documentation --------------------------------------------
 autoapi_dirs = ["../../src/zen_mapper"]
 autoapi_ignore = ["**/test*.py"]
+
+# -- Options for example gallery ----------------------------------------------
+sphinx_gallery_conf = {
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "examples",
+    "filename_pattern": "/*.py",
+}

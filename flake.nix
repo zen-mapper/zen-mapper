@@ -20,6 +20,8 @@
       ps.sphinx
       ps.sphinx-autoapi
       ps.myst-parser
+      (ps.callPackage ./nix/sphinx-gallery.nix {})
+      ps.matplotlib
     ]);
   in {
     formatter.${system} = pkgs.alejandra;
