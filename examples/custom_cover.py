@@ -60,7 +60,7 @@ plt.show()
 
 # %%
 # Creating a covering scheme
-# --------------------------
+# ==========================
 #
 # The mapper function in zen_mapper expects a `covering_scheme` which is simply
 # a function which takes data and returns a cover. I find pythons partial
@@ -117,7 +117,7 @@ plt.show()
 
 # %%
 # Using with mapper
-# -----------------
+# =================
 #
 # Now that we have a cover we will demonstrate how to plug it into zen mapper
 # to duplicate the analysis done in the original paper. We will be using a
