@@ -6,7 +6,7 @@ alias fmt := format
 
 # Run code formatters
 format:
-	ruff format src
+	ruff format .
 	ruff check src --fix
 	nix fmt
 
