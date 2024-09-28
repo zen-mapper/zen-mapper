@@ -132,6 +132,7 @@ def window(num_samples: int) -> np.ndarray:
     return choice * data + (1 - choice) * data[:, [1, 0]]
 
 
+np.random.seed(42)
 data = window(1000)
 plt.scatter(data[:, 0], data[:, 1])
 plt.gca().set_aspect("equal")
