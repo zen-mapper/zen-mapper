@@ -49,7 +49,7 @@ correctly. There is plenty of room left for some pretty trivial optimizations.
 ---
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 4
 examples/index
 autoapi/index
 ```

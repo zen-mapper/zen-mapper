@@ -14,18 +14,56 @@ logger.addHandler(logging.NullHandler())
 
 @dataclass
 class MapperResult:
-    nodes: list[np.ndarray]
-    nerve: Komplex
-    cover: list[list[int]]
+    """Holds the results of the mapper function.
+    """
+
+
+    nodes: list[np.ndarray] 
+    nerve: Komplex                   
+    cover: list[list[int]] 
 
 
 def mapper(
     data: np.ndarray,
     projection: np.ndarray,
-    cover_scheme: CoverScheme,
-    clusterer: Clusterer,
+    cover_scheme: CoverScheme,  # type: ignore
+    clusterer: Clusterer,       # type: ignore
     dim: int | None,
 ) -> MapperResult:
+    """Performs the Mapper algorithm on the given data.
+
+    This function clusters the data using the specified cover scheme and clusterer,
+    and computes the nerve complex based on the resulting clusters.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        The input data array where each row represents a data point.
+    projection : np.ndarray
+        The projected data to be used for clustering. It should correspond to the data points.
+    cover_scheme : CoverScheme
+        A callable that defines the cover scheme for the Mapper algorithm.
+    clusterer : Clusterer
+        A callable that partitions the data into clusters.
+    dim : int | None
+        The dimension of the nerve complex. If None, the dimension will not be restricted.
+
+    Returns
+    -------
+    MapperResult
+        An instance of `MapperResult` containing the nodes, the nerve complex, and the cover information.
+
+    Raises
+    ------
+    AssertionError
+        If the number of entries in `projection` does not match the number of entries in `data`.
+
+    Notes
+    -----
+    This function logs information about the clustering process for each cover element,
+    including the number of clusters found.
+    """
+    
     assert len(data) == len(
         projection
     ), "the entries in projection have to correspond to entries in data"

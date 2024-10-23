@@ -22,25 +22,53 @@ extensions = [
     "myst_parser",
     "autoapi.extension",
     "sphinx_gallery.gen_gallery",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode", # Added viewcode for source
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = []
+
+# -- Include LaTeX Support ---------------------------------------------------
+latex_engine = 'xelatex'
+latex_elements = {
+    'passoptionstopackages': r'''
+\PassOptionsToPackage{svgnames}{xcolor}
+''',
+    'fontpkg': r'''
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}
+''',
+    'preamble': r'''
+\usepackage[titles]{tocloft}
+\cftsetpnumwidth {1.25cm}\cftsetrmarg{1.5cm}
+\setlength{\cftchapnumwidth}{0.75cm}
+\setlength{\cftsecindent}{\cftchapnumwidth}
+\setlength{\cftsecnumwidth}{1.25cm}
+''',
+    'sphinxsetup': 'TitleColor=DarkGoldenrod',
+    'fncychap': r'\usepackage[Bjornstrup]{fncychap}',
+    'printindex': r'\footnotesize\raggedright\printindex',
+}
+latex_show_urls = 'footnote'
 
 # -- Other documentation -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#confval-intersphinx_mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("http://docs.scipy.org/doc/numpy/", None),
+    #Want to add link to networkx but can't find one that works
 }
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 html_theme_options = {
-    "github_user": "zen-mapper",
-    "github_repo": "zen-mapper",
+    "navigation_depth": 4,
+    "collapse_navigation": False,
+    "sticky_navigation": True,  # Enable scroll-following ToC
 }
 html_static_path = ["_static"]
 html_sidebars = {
