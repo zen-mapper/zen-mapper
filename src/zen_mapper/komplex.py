@@ -1,7 +1,12 @@
 import logging
+import sys
 from collections.abc import Iterable
 from itertools import chain, combinations, count
-from typing import Self
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 logger = logging.getLogger("zen_mapper")
 

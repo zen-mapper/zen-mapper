@@ -1,10 +1,12 @@
 {
+  lib,
   buildPythonPackage,
   pythonOlder,
   # Build
   hatchling,
   # Dependencies
   numpy,
+  typing-extensions,
   # Check
   pytestCheckHook,
   scikit-learn,
@@ -16,13 +18,15 @@ buildPythonPackage {
   version = "0.1.4";
   pyproject = true;
 
-  disabled = pythonOlder "3.11";
+  disabled = pythonOlder "3.10";
 
   src = ../.;
 
-  propagatedBuildInputs = [
-    numpy
-  ];
+  dependencies =
+    [
+      numpy
+    ]
+    ++ lib.optionals (pythonOlder "3.11") [typing-extensions];
 
   build-system = [
     hatchling

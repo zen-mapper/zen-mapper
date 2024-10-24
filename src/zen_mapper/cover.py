@@ -1,6 +1,13 @@
 import logging
+import sys
 from collections.abc import Iterator
-from typing import Protocol, Self
+from typing import Protocol
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 
 import numpy as np
 
