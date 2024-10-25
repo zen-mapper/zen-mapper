@@ -58,10 +58,11 @@
     devShells.${system}.default = pkgs.mkShell {
       venvDir = ".venv";
       buildInputs = [
+        python
         pkgs.hatch
+        pkgs.jq
         pkgs.just
         pkgs.ruff
-        python
       ];
 
       shellHook = ''
