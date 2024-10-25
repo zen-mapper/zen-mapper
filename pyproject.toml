@@ -1,6 +1,6 @@
 [project]
 name = "zen-mapper"
-version = "0.1.4"
+version = "0.1.5"
 description = "Mapper without the noise"
 license = "ISC"
 authors = [
