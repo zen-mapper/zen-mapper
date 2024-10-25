@@ -1,0 +1,50 @@
+name: Check
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  define-matrix:
+    name: Generate check actions
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      # Configure the runner
+      - name: git checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Get Checks
+        id: set-matrix
+        run: |
+         matrix="$(nix flake show --json | jq -c '{include: [ { name: .checks["x86_64-linux"] | keys | .[] }]}')"
+         printf "matrix=%s" "$matrix" >> "$GITHUB_OUTPUT"
+
+  nix-check:
+    name: ${{matrix.name}}
+    needs: define-matrix
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix: ${{fromJSON(needs.define-matrix.outputs.matrix)}}
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check Nixpkgs inputs
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          fail-mode: true
+      - run: |
+          nix develop --command \
+            just check ${{ matrix.name }}
