@@ -30,4 +30,4 @@ jobs:
       - name: Run tests
         run: |
           nix develop --command \
-            just test
+            just check

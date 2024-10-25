@@ -32,11 +32,9 @@
       pythonPackagesExtensions =
         (prev.pythonPackagesExtensions or [])
         ++ [
-          (
-            python-final: python-prev: {
-              zen-mapper = python-final.callPackage ./nix/zen-mapper.nix {};
-            }
-          )
+          (python-final: python-prev: {
+            zen-mapper = python-final.callPackage ./nix/zen-mapper.nix {};
+          })
         ];
     };
 
@@ -44,6 +42,18 @@
       path = ./nix/templates/minimal;
       description = "Minimal example of using zen-mapper with flakes";
     };
+
+    checks.${system} = builtins.listToAttrs (
+      map
+      (python: {
+        name = python;
+        value = pkgs."${python}".pkgs.callPackage ./nix/zen-mapper.nix {};
+      })
+      [
+        "python312"
+        "python311"
+      ]
+    );
 
     devShells.${system}.default = pkgs.mkShell {
       venvDir = ".venv";

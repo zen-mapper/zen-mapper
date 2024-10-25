@@ -19,6 +19,10 @@ lint:
 test:
 	pytest .
 
+# Run the nix checks
+check:
+	nix flake check
+
 # Build the docs
 docs:
 	cd docs && make dirhtml
