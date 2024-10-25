@@ -20,8 +20,8 @@ test:
 	pytest .
 
 # Run the nix checks
-check:
-	nix flake check
+check check:
+	nix build .#checks.x86_64-linux.{{check}}
 
 # Build the docs
 docs:
