@@ -11,6 +11,7 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    uv = pkgs.callPackage ./nix/uv {};
     python = pkgs.python3.withPackages (ps: [
       ps.numpy
       ps.pytest
@@ -60,6 +61,7 @@
       venvDir = ".venv";
       buildInputs = [
         python
+        uv
         pkgs.hatch
         pkgs.jq
         pkgs.just
