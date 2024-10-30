@@ -29,7 +29,7 @@ docs:
 
 # Build the package
 build:
-	hatch build
+	uv build
 
 # Clean up the working directory
 clean:
