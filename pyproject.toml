@@ -7,7 +7,7 @@ authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
 ]
 dependencies = [
-    "numpy>=1.25.0",
+    "numpy>=1.26.0",
     'typing-extensions; python_version < "3.11"',
 ]
 readme = "README.md"
@@ -31,3 +31,18 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/zen_mapper"]
 exclude = ["src/**/test*.py"]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.115.6",
+    "matplotlib>=3.9.2",
+    "networkx>=3.4.2",
+    "pytest>=8.3.3",
+    "scikit-learn>=1.5.2",
+]
+docs = [
+    "myst-parser>=4.0.0",
+    "sphinx-autoapi>=3.3.3",
+    "sphinx-gallery>=0.18.0",
+    "sphinx>=8.1.3",
+]

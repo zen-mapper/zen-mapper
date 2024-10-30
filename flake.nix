@@ -12,18 +12,6 @@
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
     uv = pkgs.callPackage ./nix/uv {};
-    python = pkgs.python3.withPackages (ps: [
-      ps.numpy
-      ps.pytest
-      ps.scikit-learn
-      ps.hypothesis
-      ps.networkx
-      ps.sphinx
-      ps.sphinx-autoapi
-      ps.myst-parser
-      (ps.callPackage ./nix/sphinx-gallery.nix {})
-      ps.matplotlib
-    ]);
   in {
     formatter.${system} = pkgs.alejandra;
 
@@ -58,9 +46,12 @@
     );
 
     devShells.${system}.default = pkgs.mkShell {
-      venvDir = ".venv";
+      NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+        pkgs.stdenv.cc.cc
+        pkgs.libz
+      ];
+
       buildInputs = [
-        python
         uv
         pkgs.hatch
         pkgs.jq
@@ -69,10 +60,8 @@
       ];
 
       shellHook = ''
-        if [ -z "$PYTHONPATH" ]
-        then export PYTHONPATH=$(realpath ./src)
-        else export PYTHONPATH=$PYTHONPATH:$(realpath ./src)
-        fi
+        uv sync --group docs --group dev
+        source .venv/bin/activate
       '';
     };
   };
