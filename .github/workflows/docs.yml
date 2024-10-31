@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
   workflow_dispatch:
 
@@ -34,10 +37,12 @@ jobs:
             just docs
 
       - name: Upload artifact
+        if: ${{ github.event_name == 'push' }}
         uses: actions/upload-pages-artifact@v2
         with:
           path: ./docs/build/dirhtml
 
       - name: Deploy to GitHub Pages
+        if: ${{ github.event_name == 'push' }}
         id: deployment
         uses: actions/deploy-pages@v3
