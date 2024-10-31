@@ -60,6 +60,10 @@
       ];
 
       shellHook = ''
+        if [ -z ''${NIX_LD+x} ]
+        then
+          export LD_LIBRARY_PATH="$NIX_LD_LIBRARY_PATH"
+        fi
         uv sync --group docs --group dev
         source .venv/bin/activate
       '';
