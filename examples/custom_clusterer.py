@@ -1,9 +1,13 @@
 """
+Creating a custom clusterer
+---------------------------
+
 This example will go over the API for creating a clusterer. We will implement a 
 density-based clusterer (no real thought was put into how useful of a clusterer 
 this is). Given an epsilon > 0, we calculate the number of neighbors a point 
-has within an epsilon ball. We then cluster the dataset into k sets, aiming to 
-equally divide the number of possible neighbors. Note that two points being in
+has within an epsilon ball. We then cluster the dataset 
+into k (num_clusters) sets, aiming to equally divide the number of possible 
+neighbors. Note that two points being in
 the same cluster tells us nothing about their Euclidean distance.
 """
 # %%
@@ -16,20 +20,14 @@ the same cluster tells us nothing about their Euclidean distance.
 # the data points in that cluster. Outliers can be removed if necessary.
 
 
-# Standard library
 from collections.abc import Iterator
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
-
-# Third-party
 import numpy as np
 
 from zen_mapper import mapper
 from zen_mapper.adapters import to_networkx
-
-# Local
 from zen_mapper.cover import Width_Balanced_Cover
 
 
@@ -44,18 +42,20 @@ def neighbor_counts(epsilon: float, data: np.ndarray) -> np.ndarray:
 
     for i in range(n_points):
         distances = np.linalg.norm(data - data[i], axis=1)
-        neighbor_count[i] = np.sum((distances <= epsilon) & (np.arange(n_points) != i))
+        neighbor_count[i] = np.sum(distances <= epsilon) - 1
 
     return neighbor_count
 
-def get_clusters(k: int, neighbor_counts: np.ndarray) -> Iterator[np.ndarray]:
+def get_clusters(
+        num_clusters: int, 
+        neighbor_counts: np.ndarray) -> Iterator[np.ndarray]:
     max_neighbors = np.max(neighbor_counts) if np.any(neighbor_counts) else 0
 
-    clusters_per_cluster = max_neighbors // k  
-    remainder = max_neighbors % k  
+    clusters_per_cluster = max_neighbors // num_clusters  
+    remainder = max_neighbors % num_clusters  
 
     start = 0 
-    for i in range(k):
+    for i in range(num_clusters):
         end = start + clusters_per_cluster + (1 if i < remainder else 0)  
         # distributes the remainder across initial clusters
         indices = np.flatnonzero((neighbor_counts > start) & (neighbor_counts <= end)) 
@@ -66,7 +66,7 @@ def get_clusters(k: int, neighbor_counts: np.ndarray) -> Iterator[np.ndarray]:
 
 def epsilon_density_clusterer(
         epsilon: float, 
-        k: int, 
+        num_clusters: int, 
         data: np.ndarray) -> Iterator[np.ndarray]:
     """
     Performs density-based clustering using an epsilon neighborhood.
@@ -85,15 +85,15 @@ def epsilon_density_clusterer(
     density_counts = neighbor_counts(epsilon=epsilon, data=data)
     
     # generate and return clusters based on the density counts
-    return get_clusters(k=k, neighbor_counts=density_counts)
+    return get_clusters(num_clusters=num_clusters, neighbor_counts=density_counts)
 
 # make our clusterer passable to zen-mapper:
 def clusterer(data):
-    return epsilon_density_clusterer(epsilon, k, data)
+    return epsilon_density_clusterer(epsilon, num_clusters, data)
 
 # clustering parameters
 epsilon = 0.1
-k = 4
+num_clusters = 4
 
 # %%
 # we can then visualize to see if this clusterer acts as we would expect.
@@ -116,7 +116,11 @@ y = radii * np.sin(angles)
 # stack x and y into a 2D array for clustering
 data = np.column_stack((x, y))
 
-clusters = list(epsilon_density_clusterer(epsilon=epsilon, k=k, data=data))
+clusters = list(epsilon_density_clusterer(
+    epsilon=epsilon, 
+    num_clusters=num_clusters, 
+    data=data
+    ))
 
 # create an array for cluster labels
 cluster_labels = np.full(data.shape[0], -1)  # use default label for noise points
@@ -130,16 +134,15 @@ scatter = plt.scatter(
     data[:, 1], 
     c=cluster_labels, 
     cmap='viridis', 
-    edgecolor='k', 
     s=30, 
-    alpha=.5
+    alpha=.75
     )
 plt.colorbar(scatter, label='Cluster ID')
 plt.title('Density Clustering')
 plt.xlabel('x')
 plt.ylabel('y')
 plt.axis('equal')
-plt.grid('True')
+plt.grid(True)
 plt.show()
 
 
@@ -189,31 +192,23 @@ for node_id, indices in enumerate(result.nodes):
 # create a color map based on node densities
 node_colors = [node_densities[node] for node in graph.nodes]
 
-# Define the color map for the density values
-cmap = plt.cm.viridis
-norm = mpl.colors.Normalize(
-    vmin=min(node_colors), 
-    vmax=max(node_colors)
-    )
-sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
-sm.set_array([])  # ScalarMappable needs an array, though it's not used here.
-
 # set up figure and axis
 fig, ax = plt.subplots(figsize=(10, 6))
 
 # plot the mapper graph with nodes colored by density
-pos = nx.kamada_kawai_layout(graph)  # use a layout for better visualization
-nx.draw(
+pos = nx.kamada_kawai_layout(graph)
+sm = nx.draw_networkx_nodes(
     graph,
     pos,
     node_color=node_colors,
-    cmap=cmap,
     node_size=100,
-    ax=ax
+    ax=ax,
 )
+nx.draw_networkx_edges(graph, pos)
 
-# add the color bar for average density, specifying the axis
-cbar = fig.colorbar(sm, ax=ax, label='Average Density')
+# add the color bar for average density
+cbar = fig.colorbar(sm, ax=ax, label="Average Density")
+
 plt.title('Mapper Graph Colored by Average Density')
 plt.show()
 # %%
