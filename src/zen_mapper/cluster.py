@@ -32,7 +32,7 @@ class sk_learn:
         labels = np.unique(self.clusterer.fit_predict(data))
 
         if -1 in labels:
-            logger.warn(
+            logger.warning(
                 "the clusterer has labeled some points as noise, "
                 "they are being discarded"
             )
