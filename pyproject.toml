@@ -8,6 +8,7 @@ authors = [
 ]
 dependencies = [
     "numpy>=1.26.0",
+    "sphinxcontrib-katex>=0.9.10",
     'typing-extensions; python_version < "3.11"',
 ]
 readme = "README.md"
