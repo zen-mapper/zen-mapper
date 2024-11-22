@@ -45,4 +45,5 @@ docs = [
     "sphinx-autoapi>=3.3.3",
     "sphinx-gallery>=0.18.0",
     "sphinx>=8.1.3",
+    "sphinxcontrib-katex>=0.9.10",
 ]
