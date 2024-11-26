@@ -67,12 +67,11 @@ sphinx_gallery_conf = {
 
 # -- Options for KaTeX rendering ----------------------------------------------
 # https://sphinxcontrib-katex.readthedocs.io
-katex_css_path = \
-    'https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css'
-katex_js_path = 'katex.min.js'
-katex_autorender_path = 'auto-render.min.js'
-katex_inline = [r'\(', r'\)']
-katex_display = [r'\[', r'\]']
+katex_css_path = "https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css"
+katex_js_path = "katex.min.js"
+katex_autorender_path = "auto-render.min.js"
+katex_inline = [r"\(", r"\)"]
+katex_display = [r"\[", r"\]"]
 
 # Prerender requires nodeJS and KaTeX executable on PATH,
 # currently disabled for the above reason.
@@ -86,6 +85,6 @@ latex_macros = r"""
 """
 # Translates LaTeX macros to KaTeX macros/options
 katex_macros = katex.latex_defs_to_katex_macros(latex_macros)
-katex_options = 'macros: {' + katex_macros + '}'
+katex_options = "macros: {" + katex_macros + "}"
 # Adds LaTeX macros for LaTeX builder
-latex_elements = {'preamble': latex_macros}
+latex_elements = {"preamble": latex_macros}

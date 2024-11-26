@@ -8,7 +8,6 @@ authors = [
 ]
 dependencies = [
     "numpy>=1.26.0",
-    "sphinxcontrib-katex>=0.9.10",
     'typing-extensions; python_version < "3.11"',
 ]
 readme = "README.md"
@@ -46,4 +45,5 @@ docs = [
     "sphinx-autoapi>=3.3.3",
     "sphinx-gallery>=0.18.0",
     "sphinx>=8.1.3",
+    "sphinxcontrib-katex>=0.9.10",
 ]
