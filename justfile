@@ -12,7 +12,7 @@ format:
 
 # Check for style issues
 lint:
-	ruff format --check src
+	ruff format --check .
 	ruff check src
 
 # Run the test suite
