@@ -11,7 +11,6 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    uv = pkgs.callPackage ./nix/uv {};
   in {
     formatter.${system} = pkgs.alejandra;
 
@@ -52,7 +51,7 @@
       ];
 
       buildInputs = [
-        uv
+        pkgs.uv
         pkgs.hatch
         pkgs.jq
         pkgs.just
