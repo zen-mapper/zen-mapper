@@ -10,6 +10,7 @@ else:
 
 
 import numpy as np
+import numpy.typing as npt
 
 logger = logging.getLogger("zen_mapper")
 
@@ -78,7 +79,7 @@ class Width_Balanced_Cover:
 
     Parameters
     ----------
-    n_elements : int
+    n_elements : ArrayLike
         the number of covering elements along each dimension. If the data is
         dimension d this results in d^n covering elements.
 
@@ -95,8 +96,10 @@ class Width_Balanced_Cover:
         if percent_overlap is not in (0,1)
     """
 
-    def __init__(self, n_elements: int, percent_overlap: float):
-        if n_elements < 1:
+    def __init__(self, n_elements: npt.ArrayLike, percent_overlap: float):
+        n_elements = np.array([n_elements], dtype=int)
+
+        if np.any(n_elements < 1):
             raise ValueError("n_elements must be at least 1")
 
         if not 0 < percent_overlap < 1:
@@ -117,6 +120,7 @@ class Width_Balanced_Cover:
         width = (upper_bound - lower_bound) / (
             self.n_elements - (self.n_elements - 1) * self.percent_overlap
         )
+        width = width.flatten()
         self.width = width
 
         # Compute the centers of the "lower left" and "upper right" cover

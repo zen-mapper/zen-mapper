@@ -110,6 +110,16 @@ def test_width_balanced(data, n, gain):
     assert len(data) == len(covered_data)
 
 
+def test_width_balanced_multiple_widths():
+    """Make sure you can compute a width balanced cover with multiple widths defined"""
+    data = np.arange(100).reshape((25, 4))
+    gain = 0.4
+    n = [1, 1, 2, 2]
+    cover_scheme = Width_Balanced_Cover(n, gain)
+    covered_data = reduce(lambda acc, new: acc.union(new), cover_scheme(data), set())
+    assert len(data) == len(covered_data)
+
+
 def test_width_balanced_int():
     """Ensure that width balanced covers handle integer data gracefully"""
     data = np.arange(100, dtype=int)
