@@ -12,7 +12,7 @@ project = "Zen Mapper"
 description = "Mapper without the noise"
 copyright = "2023, Ethan Rooke"
 author = "Ethan Rooke"
-release = "0.1.5"
+release = "0.2.0"
 
 
 # -- General configuration ---------------------------------------------------

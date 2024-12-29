@@ -15,18 +15,16 @@
 }:
 buildPythonPackage {
   pname = "zen-mapper";
-  version = "0.1.5";
+  version = "0.2.0";
   pyproject = true;
 
   disabled = pythonOlder "3.10";
 
   src = ../.;
 
-  dependencies =
-    [
-      numpy
-    ]
-    ++ lib.optionals (pythonOlder "3.11") [typing-extensions];
+  dependencies = [
+    numpy
+  ] ++ lib.optionals (pythonOlder "3.11") [ typing-extensions ];
 
   build-system = [
     hatchling
