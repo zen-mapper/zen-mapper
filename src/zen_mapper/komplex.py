@@ -14,9 +14,9 @@ logger = logging.getLogger("zen_mapper")
 class Simplex(tuple[int, ...]):
     def __new__(cls, vertices: Iterable[int]):
         _simplex = sorted(vertices)
-        assert len(_simplex) == len(
-            set(_simplex)
-        ), "A simplex must not have repeated elements"
+        assert len(_simplex) == len(set(_simplex)), (
+            "A simplex must not have repeated elements"
+        )
         assert len(_simplex) != 0, "A simplex must have at least one vertex"
         return super().__new__(cls, tuple(_simplex))
 

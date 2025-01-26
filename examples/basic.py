@@ -36,7 +36,7 @@ for i, c in enumerate(cover):
     plt.scatter(
         projection[c],
         np.full_like(c, i),
-        label=f"Cover element: {i+1}",
+        label=f"Cover element: {i + 1}",
     )
 
 plt.legend()
@@ -49,7 +49,7 @@ for i, c in enumerate(cover):
     plt.scatter(
         data[c, 0],
         data[c, 1] + 0.5 * i,
-        label=f"Cover element: {i+1}",
+        label=f"Cover element: {i + 1}",
     )
 
 plt.legend()
