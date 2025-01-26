@@ -22,9 +22,11 @@ buildPythonPackage {
 
   src = ../.;
 
-  dependencies = [
-    numpy
-  ] ++ lib.optionals (pythonOlder "3.11") [ typing-extensions ];
+  dependencies =
+    [
+      numpy
+    ]
+    ++ lib.optionals (pythonOlder "3.11") [typing-extensions];
 
   build-system = [
     hatchling
