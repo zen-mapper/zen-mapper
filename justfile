@@ -14,6 +14,7 @@ format:
 lint:
 	ruff format --check .
 	ruff check src
+	alejandra --check .
 
 # Run the test suite
 test:
