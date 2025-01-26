@@ -56,6 +56,7 @@
         pkgs.jq
         pkgs.just
         pkgs.ruff
+        self.formatter.${system}
       ];
 
       shellHook = ''
