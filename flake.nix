@@ -50,6 +50,8 @@
         pkgs.libz
       ];
 
+      LC_ALL = "en_US.UTF-8";
+
       buildInputs = [
         pkgs.uv
         pkgs.hatch
