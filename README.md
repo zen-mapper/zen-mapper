@@ -29,6 +29,7 @@ nix flake new -t github:zen-mapper/zen-mapper new_project
 cd new_project
 nix develop
 ```
+
 Will drop you into a shell with python 3 and Zen Mapper configured.
 
 # Contributing
