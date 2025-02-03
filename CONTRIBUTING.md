@@ -18,7 +18,7 @@ The general pipeline for getting code added to zen-mapper is as follows:
 1. [fork zen-mapper](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
 2. [create a branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches)
 3. write your code
-4. [open a pull pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
+4. [open a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
 
 Before submitting a new feature it is wise to open an issue discussing the
 proposed feature to make sure that there is interest first. Beyond that we can

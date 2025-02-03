@@ -34,4 +34,4 @@ Will drop you into a shell with python 3.11 and Zen Mapper configured.
 # Contributing
 
 To find out more about contributing see
-[CONTRIBUTING.md](blob/main/CONTRIBUTING.md).
+[CONTRIBUTING.md](CONTRIBUTING.md).
