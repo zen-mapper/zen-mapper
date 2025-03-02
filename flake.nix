@@ -16,15 +16,7 @@
 
     packages.${system}.default = pkgs.python3Packages.callPackage ./nix/zen-mapper.nix {};
 
-    overlays.default = final: prev: {
-      pythonPackagesExtensions =
-        (prev.pythonPackagesExtensions or [])
-        ++ [
-          (python-final: python-prev: {
-            zen-mapper = python-final.callPackage ./nix/zen-mapper.nix {};
-          })
-        ];
-    };
+    overlays.default = import ./nix/overlay.nix;
 
     templates.default = {
       path = ./nix/templates/minimal;
