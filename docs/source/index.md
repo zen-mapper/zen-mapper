@@ -50,5 +50,6 @@ correctly. There is plenty of room left for some pretty trivial optimizations.
 :hidden:
 examples/index
 autoapi/index
+changelog
 decisions/index
 ```
