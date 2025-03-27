@@ -6,7 +6,7 @@ import numpy as np
 from zen_mapper.cluster import Clusterer
 
 from .cover import CoverScheme
-from .komplex import Komplex, compute_nerve
+from .simplex import SimplexTree
 
 logger = logging.getLogger("zen_mapper")
 logger.addHandler(logging.NullHandler())
@@ -15,7 +15,7 @@ logger.addHandler(logging.NullHandler())
 @dataclass
 class MapperResult:
     nodes: list[np.ndarray]
-    nerve: Komplex
+    nerve: SimplexTree
     cover: list[list[int]]
 
 
@@ -47,8 +47,11 @@ def mapper(
         else:
             cover_id.append(list())
 
+    nerve = SimplexTree()
+    nerve.compute_nerve(covers=nodes, dim=dim, min_intersection=min_intersection)
+
     return MapperResult(
         nodes=nodes,
-        nerve=compute_nerve(nodes, dim=dim),
+        nerve=nerve,
         cover=cover_id,
     )

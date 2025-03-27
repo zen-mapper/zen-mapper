@@ -1,16 +1,23 @@
-from zen_mapper.komplex import Komplex
 from zen_mapper.simplex import SimplexTree
 
 
-def to_networkx(komplex: Komplex):
+def to_networkx(simplex_tree: SimplexTree):
+    """
+    Exports the mapper graph to a networkx graph.
+    """
     try:
         import networkx as nx
     except ImportError as e:
         raise ImportError("networkx is needed to export to networkx") from e
 
     G = nx.Graph()
-    G.add_nodes_from(komplex.vertices)
-    G.add_edges_from(komplex[1])
+
+    vertices = [s[0] for s in simplex_tree.get_simplices(dim=0)]
+    edges = simplex_tree.get_simplices(dim=1)
+
+    G.add_nodes_from(vertices)
+    G.add_edges_from(edges)
+
     return G
 
 
