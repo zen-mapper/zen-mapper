@@ -25,6 +25,7 @@ def mapper(
     cover_scheme: CoverScheme,
     clusterer: Clusterer,
     dim: int | None,
+    min_intersection: int = 1,
 ) -> MapperResult:
     assert len(data) == len(projection), (
         "the entries in projection have to correspond to entries in data"
