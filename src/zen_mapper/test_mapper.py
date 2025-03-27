@@ -4,6 +4,7 @@ from sklearn.cluster import DBSCAN
 from . import mapper
 from .cluster import sk_learn
 from .cover import Width_Balanced_Cover
+from .simplex import get_skeleton
 
 
 def test_mapper():
@@ -24,7 +25,11 @@ def test_mapper():
         clusterer=clusterer,
         dim=1,
     )
-    assert result.nerve.dim == 1
-    assert len(list(result.nerve)) == 8
-    assert len(list(result.nerve[0])) == 4
-    assert len(list(result.nerve[1])) == 4
+    assert result.nerve.dimension == 1
+    assert len(result.nerve.get_simplices()) == 8
+
+    vertices = [s for s in get_skeleton(result.nerve, 0) if len(s) == 1]
+    assert len(vertices) == 4
+
+    edges = [s for s in get_skeleton(result.nerve, 1) if len(s) == 2]
+    assert len(edges) == 4
