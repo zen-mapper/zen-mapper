@@ -34,6 +34,7 @@ jobs:
     needs: define-matrix
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix: ${{fromJSON(needs.define-matrix.outputs.matrix)}}
     steps:
       - name: git checkout
