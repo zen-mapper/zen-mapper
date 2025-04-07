@@ -168,9 +168,22 @@ class SimplexTree:
         # Do edges first
         if max_dim >= 1:
             for i in range(n_covers):
+                set_i = set(self._covers[i])
                 for j in range(i + 1, n_covers):
-                    if has_intersection(i, j):
-                        self.insert([i, j])
+                    set_j = set(self._covers[j])
+
+                    # can now terminate early
+                    count = 0
+                    # go through the smaller set
+                    smaller_set = set_i if len(set_i) < len(set_j) else set_j
+                    larger_set = set_j if len(set_i) < len(set_j) else set_i
+
+                    for element in smaller_set:
+                        if element in larger_set:
+                            count += 1
+                            if count >= min_intersection:
+                                self.insert([i, j])
+                                break
 
             # If no edges were added, we're done
             if not self.get_simplices(dim=1):
