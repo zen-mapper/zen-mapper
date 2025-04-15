@@ -64,7 +64,9 @@ def mapper(
 
     cover_elements = map(np.array, cover_scheme(projection))
 
-    for i, element in enumerate(cover_elements):
+    for i, element in enumerate(
+        filter(lambda element: element.size != 0, cover_elements)
+    ):
         logger.info("Clustering cover element %d", i)
         clusters = clusterer(data[element])
         new_nodes = [element[cluster] for cluster in clusters]
