@@ -33,7 +33,9 @@ def mapper(
     nodes = list()
     cover_id = list()
 
-    for i, element in enumerate(cover_scheme(projection)):
+    for i, element in enumerate(
+        element for element in cover_scheme(projection) if element.size != 0
+    ):
         logger.info("Clustering cover element %d", i)
         clusters = clusterer(data[element])
         new_nodes = [element[cluster] for cluster in clusters]
