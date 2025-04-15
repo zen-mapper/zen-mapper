@@ -25,7 +25,7 @@ class sk_learn:
         """A clusterer implementing the sk-learn api"""
 
     def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
-        if len(data) <= 0:
+        if len(data) <= 1:
             yield np.arange(len(data))
             return
 
