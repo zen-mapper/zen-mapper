@@ -34,7 +34,7 @@ jobs:
       - name: Build html docs
         run: |
           nix develop --command \
-            just docs
+            just doc-build
 
       - name: Upload artifact
         if: ${{ github.event_name == 'push' }}

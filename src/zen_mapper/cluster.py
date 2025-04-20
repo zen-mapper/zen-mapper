@@ -25,8 +25,8 @@ class sk_learn:
         """A clusterer implementing the sk-learn api"""
 
     def __call__(self, data: np.ndarray) -> Iterator[np.ndarray]:
-        if len(data) == 0:
-            yield np.array([], dtype=int)
+        if len(data) <= 1:
+            yield np.arange(len(data))
             return
 
         labels = np.unique(self.clusterer.fit_predict(data))
