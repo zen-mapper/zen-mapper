@@ -22,10 +22,12 @@ The general pipeline for getting code added to zen-mapper is as follows:
 
 Before submitting a new feature it is wise to open an issue discussing the
 proposed feature to make sure that there is interest first. Beyond that we can
+
 hash everything out during the review process. What follows are tips on how to
 develop code for zen-mapper and requirements for getting a change merged. Don't
 worry too much about following these to the letter, that's what the review
 process is for.
+
 
 ### Developer Environment
 
@@ -38,6 +40,7 @@ If you don't use nix, we provide files for using uv to manage your environment.
 Instructions on how to do that can be found
 [here](https://docs.astral.sh/uv/guides/projects/).
 
+
 ### Architectural Design Decisions
 
 If your change includes a design choice which addresses a requirement which is
@@ -48,3 +51,4 @@ There are templates in `docs/source/decisions` for you to use. Do not worry
 about this too much if opening a PR, if one is needed it will be mentioned
 before merging and it will probably encode whatever discussion in the issues or
 pull request led to the decision being made.
+

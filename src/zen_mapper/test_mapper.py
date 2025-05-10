@@ -24,7 +24,19 @@ def test_mapper():
         clusterer=clusterer,
         dim=1,
     )
+
+    result2 = mapper(
+        data=data,
+        projection=data[:, 0],
+        cover_scheme=None,
+        clusterer=clusterer,
+        dim=1,
+        precomputed_cover=cover_scheme(data[:, 0]),
+    )
     assert result.nerve.dim == 1
     assert len(list(result.nerve)) == 8
     assert len(list(result.nerve[0])) == 4
     assert len(list(result.nerve[1])) == 4
+    assert len(list(result.nerve)) == len(list(result2.nerve))
+    assert len(list(result.nerve[0])) == len(list(result2.nerve[0]))
+    assert len(list(result.nerve[1])) == len(list(result2.nerve[1]))
