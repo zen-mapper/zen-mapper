@@ -25,15 +25,53 @@ def mapper(
     cover_scheme: CoverScheme,
     clusterer: Clusterer,
     dim: int | None,
+    min_intersection: int = 1,
+    precomputed_cover: list[list[int]] = None,
 ) -> MapperResult:
-    assert len(data) == len(projection), (
-        "the entries in projection have to correspond to entries in data"
-    )
+    """
+    Constructs a simplicial complex representation of the data.
+
+    Parameters
+    ----------
+    data: np.ndarray
+    projection: np.ndarray
+        The output of the lens/filter function on the data. Must have the same
+        number of elements as data.
+    cover_scheme: CoverScheme
+        For cover generation. Should be a callable object that takes a
+        numpy array and returns a list of list(indices).
+    clusterer: Clusterer
+        A callable object that takes in a dataset and returns an iterator of
+        numpy arrays which contain indices for clustered points.
+    dim: int
+        The highest dimension of the mapper complex to compute.
+    min_intersection: int
+        The minimum intersection required between clusters to make a simplex.
+    precomputed_cover: list[list[int]]
+        A precomputed cover of the projection. If provided, the cover_scheme
+        parameter will be ignored and this cover will be used instead.
+
+    Returns
+    -------
+    MapperResult
+        An object containing:
+        - nodes: List of clusters where each cluster is a list of data indices.
+        - nerve: A complete list of simplices.
+        - cover: List of list(indices) corresponding to elements of the cover.
+    """
+    assert len(data) == len(
+        projection
+    ), "the entries in projection have to correspond to entries in data"
 
     nodes = list()
     cover_id = list()
 
-    for i, element in enumerate(cover_scheme(projection)):
+    if precomputed_cover is not None:
+        cover_elements = precomputed_cover
+    else:
+        cover_elements = cover_scheme(projection)
+
+    for i, element in enumerate(cover_elements):
         logger.info("Clustering cover element %d", i)
         clusters = clusterer(data[element])
         new_nodes = [element[cluster] for cluster in clusters]
@@ -48,6 +86,6 @@ def mapper(
 
     return MapperResult(
         nodes=nodes,
-        nerve=compute_nerve(nodes, dim=dim),
+        nerve=compute_nerve(nodes, dim=dim, min_intersection=min_intersection),
         cover=cover_id,
     )
