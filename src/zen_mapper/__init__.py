@@ -59,9 +59,9 @@ def mapper(
         - nerve: A complete list of simplices.
         - cover: List of list(indices) corresponding to elements of the cover.
     """
-    assert len(data) == len(
-        projection
-    ), "the entries in projection have to correspond to entries in data"
+    assert len(data) == len(projection), (
+        "the entries in projection have to correspond to entries in data"
+    )
 
     nodes = list()
     cover_id = list()
