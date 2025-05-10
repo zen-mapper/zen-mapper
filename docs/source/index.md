@@ -46,10 +46,11 @@ Preference was given to write the most obvious implementations which would work
 for this initial pre-release. This was to make sure everything was working
 correctly. There is plenty of room left for some pretty trivial optimizations.
 
----
-
 ```{toctree}
-:maxdepth: 2
+:hidden:
 examples/index
 autoapi/index
+contributing
+changelog
+decisions/index
 ```

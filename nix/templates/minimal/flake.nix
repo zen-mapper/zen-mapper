@@ -2,7 +2,7 @@
   description = "A minimal flake loading zen-mapper";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/23.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
     zen-mapper = {
       url = "github:zen-mapper/zen-mapper";
@@ -17,7 +17,7 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [zen-mapper.overlays.default];
-    python = pkgs.python311;
+    python = pkgs.python3;
   in {
     devShells.${system}.default = pkgs.mkShell {
       buildInputs = [
