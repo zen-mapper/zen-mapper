@@ -25,8 +25,12 @@ check check:
 	nix build .#checks.x86_64-linux.{{check}}
 
 # Build the docs
-docs:
+doc-build:
 	cd docs && make dirhtml
+
+# Serve the docs
+doc-serve: doc-build
+	python -m http.server -d docs/build/dirhtml
 
 # Build the package
 build:
