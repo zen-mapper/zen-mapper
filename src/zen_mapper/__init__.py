@@ -26,7 +26,6 @@ def mapper(
     clusterer: Clusterer,
     dim: int | None,
     min_intersection: int = 1,
-    precomputed_cover: list[list[int]] = None,
 ) -> MapperResult:
     """
     Constructs a simplicial complex representation of the data.
@@ -47,9 +46,6 @@ def mapper(
         The highest dimension of the mapper complex to compute.
     min_intersection: int
         The minimum intersection required between clusters to make a simplex.
-    precomputed_cover: list[list[int]]
-        A precomputed cover of the projection. If provided, the cover_scheme
-        parameter will be ignored and this cover will be used instead.
 
     Returns
     -------
@@ -66,12 +62,7 @@ def mapper(
     nodes = list()
     cover_id = list()
 
-    if precomputed_cover is not None:
-        cover_elements = precomputed_cover
-    else:
-        cover_elements = cover_scheme(projection)
-
-    cover_elements = map(np.array, cover_elements)
+    cover_elements = map(np.array, cover_scheme(projection))
 
     for i, element in enumerate(cover_elements):
         logger.info("Clustering cover element %d", i)

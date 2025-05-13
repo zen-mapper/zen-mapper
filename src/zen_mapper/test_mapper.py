@@ -3,7 +3,7 @@ from sklearn.cluster import DBSCAN
 
 from . import mapper
 from .cluster import sk_learn
-from .cover import Width_Balanced_Cover
+from .cover import Width_Balanced_Cover, precomputed_cover
 
 
 def test_mapper():
@@ -28,10 +28,9 @@ def test_mapper():
     result2 = mapper(
         data=data,
         projection=data[:, 0],
-        cover_scheme=None,
+        cover_scheme=precomputed_cover(cover_scheme(data[:, 0])),
         clusterer=clusterer,
         dim=1,
-        precomputed_cover=cover_scheme(data[:, 0]),
     )
     assert result.nerve.dim == 1
     assert len(list(result.nerve)) == 8

@@ -25,6 +25,21 @@ class CoverScheme(Protocol):
     def __call__(self: Self, data: np.ndarray) -> Cover: ...
 
 
+def precomputed_cover(cover: Cover) -> CoverScheme:
+    """A precomputed cover
+
+    Parameters
+    ----------
+    cover : Cover
+        the precomputed cover to use
+    """
+
+    def inner(*_):
+        return cover
+
+    return inner  # type: ignore
+
+
 def rectangular_cover(centers, widths, data, tol=1e-9):
     if len(centers.shape) == 1:
         centers = centers.reshape(-1, 1)
