@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Mapper now takes a `min_intersection` parameter to allow specifying the
+  overlap in the nerve.
+- `zen_mapper.cover.precomputed_cover` was added which allows specifying a
+  precomputed cover instead of a cover scheme.
+
+### Change
+
+- The cover protocol previously required being an iterable of numpy arrays.
+  This was loosened to allow for iterables of anything which is convertible to
+  a numpy array.
+
+### Fixed
+
+- `sk_learn` cluster adapter no longer panics if given a dataset with 1 element
+
 ## [0.2.0] - 2024-12-28
 
 ### Added
