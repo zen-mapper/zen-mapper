@@ -10,8 +10,8 @@ format:
 	ruff check src --fix
 	nix fmt
 
-# Check for style issues
-lint:
+# Check for issues
+lint: type-check
 	ruff format --check .
 	ruff check src
 	alejandra --check .
