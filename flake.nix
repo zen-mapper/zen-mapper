@@ -46,6 +46,7 @@
       LC_ALL = "en_US.UTF-8";
 
       buildInputs = [
+        pkgs.pyright
         pkgs.uv
         pkgs.hatch
         pkgs.jq
