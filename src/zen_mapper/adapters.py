@@ -9,5 +9,8 @@ def to_networkx(komplex: Komplex):
 
     G = nx.Graph()
     G.add_nodes_from(komplex.vertices)
-    G.add_edges_from(komplex[1])
+    # Type checking is mad here because it can't determine that all the tuples
+    # in `komplex[1]` are of dimension 2. I can't think of an obvious way to
+    # remedy this right now.
+    G.add_edges_from(komplex[1])  # type: ignore
     return G
