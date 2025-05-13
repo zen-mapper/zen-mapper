@@ -41,3 +41,7 @@ clean:
 	rm -rf dist/ docs/build/ result
 	find src/ -type f -name "*.pyc" -delete
 	find src/ -type d -name "__pycache__" -delete
+
+# Run the type checker
+type-check:
+	pyright src
