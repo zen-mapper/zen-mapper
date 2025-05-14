@@ -145,7 +145,7 @@ plt.show()
 
 
 def trivial(data: np.ndarray):
-    yield np.arange(len(data))
+    return [np.arange(len(data))], None
 
 
 # %%
