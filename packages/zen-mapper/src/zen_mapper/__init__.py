@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import Generic, TypeVar
 
 import numpy as np
 
@@ -11,22 +12,25 @@ from .komplex import Komplex, compute_nerve
 logger = logging.getLogger("zen_mapper")
 logger.addHandler(logging.NullHandler())
 
+M = TypeVar("M")
+
 
 @dataclass
-class MapperResult:
+class MapperResult(Generic[M]):
     nodes: list[np.ndarray]
     nerve: Komplex
     cover: list[list[int]]
+    cluster_metadata: list[M]
 
 
 def mapper(
     data: np.ndarray,
     projection: np.ndarray,
     cover_scheme: CoverScheme,
-    clusterer: Clusterer,
+    clusterer: Clusterer[M],
     dim: int | None,
     min_intersection: int = 1,
-) -> MapperResult:
+) -> MapperResult[M]:
     """
     Constructs a simplicial complex representation of the data.
 
@@ -61,12 +65,14 @@ def mapper(
 
     nodes = list()
     cover_id = list()
+    metadata = list()
 
     cover_elements = map(np.array, cover_scheme(projection))
 
     for i, element in enumerate(cover_elements):
         logger.info("Clustering cover element %d", i)
-        clusters = clusterer(data[element])
+        clusters, meta = clusterer(data[element])
+        metadata.append(meta)
         new_nodes = [element[cluster] for cluster in clusters]
         logger.info("Found %d clusters", len(new_nodes))
         if new_nodes:
@@ -81,4 +87,5 @@ def mapper(
         nodes=nodes,
         nerve=compute_nerve(nodes, dim=dim, min_intersection=min_intersection),
         cover=cover_id,
+        cluster_metadata=metadata,
     )
