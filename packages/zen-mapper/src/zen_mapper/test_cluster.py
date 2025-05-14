@@ -9,7 +9,8 @@ def test_sk_learn():
     data = np.column_stack([np.cos(theta), np.sin(theta)])
     db = DBSCAN(eps=0.1, min_samples=2)
     clusterer = sk_learn(db)
-    clusters = list(clusterer(data))
+    clusters, _ = clusterer(data)
+    clusters = list(clusters)
     assert len(clusters) == 1
     assert len(clusters[0]) == len(data)
 
@@ -17,6 +18,7 @@ def test_sk_learn():
 def test_empty_dtype():
     db = DBSCAN(eps=0.1, min_samples=2)
     clusterer = sk_learn(db)
-    clusters = list(clusterer(np.array([])))
+    clusters, _ = clusterer(np.array([]))
+    clusters = list(clusters)
     for cluster in clusters:
         assert cluster.dtype == "int64"
