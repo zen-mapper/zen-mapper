@@ -90,7 +90,7 @@ def epsilon_density_clusterer(
 
 # make our clusterer passable to zen-mapper:
 def clusterer(data):
-    return epsilon_density_clusterer(epsilon, num_clusters, data)
+    return epsilon_density_clusterer(epsilon, num_clusters, data), None
 
 
 # clustering parameters
