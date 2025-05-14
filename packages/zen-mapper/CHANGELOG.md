@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The cover protocol previously required being an iterable of numpy arrays.
   This was loosened to allow for iterables of anything which is convertible to
   a numpy array.
+- The clusterer protocol requires returning a metadata object now.
 
 ### Fixed
 
