@@ -89,6 +89,6 @@ def sk_learn(base_clusterer: C) -> Clusterer[C]:
             labels != -1
         ]  # -1 indicates noise, we don't do anything with it
         c = clusterer.labels_ == labels[:, np.newaxis]  # type: ignore
-        return (np.flatnonzero(x) for x in c), clusterer
+        return map(np.flatnonzero, c), clusterer
 
     return inner
