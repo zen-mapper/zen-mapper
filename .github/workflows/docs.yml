@@ -34,13 +34,13 @@ jobs:
       - name: Build html docs
         run: |
           nix develop --command \
-            just doc-build
+            just zen doc-build
 
       - name: Upload artifact
         if: ${{ github.event_name == 'push' }}
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/build/dirhtml
+          path: ./packages/zen-mapper/docs/build/dirhtml
 
       - name: Deploy to GitHub Pages
         if: ${{ github.event_name == 'push' }}

@@ -30,4 +30,4 @@ jobs:
       - name: Check formatting
         run: |
           nix develop --command \
-            just lint
+            just zen lint

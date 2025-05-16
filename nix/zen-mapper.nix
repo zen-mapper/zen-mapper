@@ -20,7 +20,7 @@ buildPythonPackage {
 
   disabled = pythonOlder "3.10";
 
-  src = ../.;
+  src = ../packages/zen-mapper;
 
   dependencies =
     [

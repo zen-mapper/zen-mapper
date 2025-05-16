@@ -1,0 +1,49 @@
+[project]
+name = "zen-mapper"
+version = "0.2.0"
+description = "Mapper without the noise"
+license = "ISC"
+authors = [
+    { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
+]
+dependencies = [
+    "numpy>=1.26.0",
+    'typing-extensions; python_version < "3.11"',
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+
+[project.urls]
+"Homepage" = "https://github.com/zen-mapper/zen-mapper"
+"Bug Tracker" = "https://github.com/zen-mapper/zen-mapper/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zen_mapper"]
+exclude = ["src/**/test*.py"]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.115.6",
+    "matplotlib>=3.9.2",
+    "networkx>=3.4.2",
+    "pytest>=8.3.3",
+    "scikit-learn>=1.5.2",
+]
+docs = [
+    "myst-parser>=4.0.0",
+    "sphinx-autoapi>=3.3.3",
+    "sphinx-gallery>=0.18.0",
+    "sphinx>=8.1.3",
+    "sphinxcontrib-katex>=0.9.10",
+]

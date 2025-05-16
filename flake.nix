@@ -33,7 +33,6 @@
         "python313"
         "python312"
         "python311"
-        "python310"
       ]
     );
 
@@ -46,11 +45,13 @@
       LC_ALL = "en_US.UTF-8";
 
       buildInputs = [
+        pkgs.pyright
         pkgs.uv
         pkgs.hatch
         pkgs.jq
         pkgs.just
         pkgs.ruff
+        pkgs.pyright
         self.formatter.${system}
       ];
 
