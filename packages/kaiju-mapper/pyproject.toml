@@ -1,0 +1,14 @@
+[project]
+name = "kaiju-mapper"
+version = "0.1.0"
+description = "Mapper with the noise"
+readme = "README.md"
+authors = [
+    { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
