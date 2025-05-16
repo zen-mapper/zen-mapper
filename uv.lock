@@ -8,6 +8,7 @@ resolution-markers = [
 
 [manifest]
 members = [
+    "kaiju-mapper",
     "zen-mapper",
 ]
 
@@ -326,6 +327,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/64/33/60135848598c076ce
 wheels = [
     { url = "https://files.pythonhosted.org/packages/91/29/df4b9b42f2be0b623cbd5e2140cafcaa2bef0759a00b7b70104dcfe2fb51/joblib-1.4.2-py3-none-any.whl", hash = "sha256:06d478d5674cbc267e7496a410ee875abd68e4340feff4490bcb7afb88060ae6", size = 301817, upload-time = "2024-05-02T12:15:00.765Z" },
 ]
+
+[[package]]
+name = "kaiju-mapper"
+version = "0.1.0"
+source = { editable = "packages/kaiju-mapper" }
 
 [[package]]
 name = "kiwisolver"
