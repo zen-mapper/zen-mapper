@@ -51,6 +51,7 @@
         pkgs.jq
         pkgs.just
         pkgs.ruff
+        pkgs.pyright
         self.formatter.${system}
       ];
 
