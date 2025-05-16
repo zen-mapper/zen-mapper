@@ -48,4 +48,4 @@ jobs:
           fail-mode: true
       - run: |
           nix develop --command \
-            just check ${{ matrix.name }}
+            just zen check ${{ matrix.name }}
