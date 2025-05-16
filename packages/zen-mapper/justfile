@@ -36,6 +36,10 @@ doc-serve: doc-build
 build:
 	uv build
 
+# Publish the package to pypi
+publish:
+	uv publish
+
 # Clean up the working directory
 clean:
 	rm -rf dist/ docs/build/ result
