@@ -1,6 +1,6 @@
 [project]
 name = "kaiju-mapper"
-version = "0.1.0"
+version = "0.1.1"
 description = "Mapper with the noise"
 readme = "README.md"
 authors = [
