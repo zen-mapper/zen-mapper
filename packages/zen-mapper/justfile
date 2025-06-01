@@ -38,7 +38,7 @@ build:
 
 # Publish the package to pypi
 publish:
-	uv publish --trusted-publishing always
+	uv publish
 
 # Clean up the working directory
 clean:
