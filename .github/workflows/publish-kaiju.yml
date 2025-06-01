@@ -1,0 +1,43 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "kaiju/*"
+
+jobs:
+  publish:
+    name: Build distribution
+    environment: pypi
+    runs-on: ubuntu-22.04
+    steps:
+      # Configure the runner
+      - name: git checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Check Nixpkgs inputs
+        uses: DeterminateSystems/flake-checker-action@main
+        with:
+          fail-mode: true
+
+      # Build
+      - name: Build dist
+        run: |
+          nix develop --command \
+            just kaiju build
+
+      # Upload artifacts
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      # Publish
+      - name: Publish to pypi
+        run: |
+          nix develop --command \
+            just kaiju publish
