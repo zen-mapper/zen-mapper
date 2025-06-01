@@ -330,7 +330,7 @@ wheels = [
 
 [[package]]
 name = "kaiju-mapper"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/kaiju-mapper" }
 dependencies = [
     { name = "zen-mapper" },
