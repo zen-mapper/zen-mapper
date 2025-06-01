@@ -1,0 +1,33 @@
+# List the tasks by default
+@_default:
+	just --list
+
+alias fmt := format
+
+# Run code formatters
+format:
+	ruff format .
+	ruff check src --fix
+
+# Check for issues
+lint: type-check
+	ruff format --check .
+	ruff check src
+
+
+# Build the package
+build:
+	uv build
+
+# Publish the package to pypi
+publish:
+	uv publish
+
+# Clean up the working directory
+clean:
+	find src/ -type f -name "*.pyc" -delete
+	find src/ -type d -name "__pycache__" -delete
+
+# Run the type checker
+type-check:
+	pyright src
