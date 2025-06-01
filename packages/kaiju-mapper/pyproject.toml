@@ -7,7 +7,9 @@ authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "zen-mapper>=0.2.0"
+]
 
 [build-system]
 requires = ["hatchling"]
