@@ -5,3 +5,7 @@ package = false
 members = [
     "packages/*",
 ]
+
+[tool.uv.sources]
+kaiju-mapper = { workspace = true }
+zen-mapper = { workspace = true }
