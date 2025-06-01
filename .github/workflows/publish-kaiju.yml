@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Publish kaiju-mapper to PyPI
 
 on:
   workflow_dispatch:
