@@ -9,7 +9,10 @@ on:
 jobs:
   publish:
     name: Build distribution
-    environment: pypi
+    environment:
+      name: pypi
+    permissions:
+      id-token: write
     runs-on: ubuntu-22.04
     steps:
       # Configure the runner
