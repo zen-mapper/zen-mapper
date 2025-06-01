@@ -17,7 +17,7 @@ lint: type-check
 
 # Build the package
 build:
-	uv build
+	uv build -o ./dist
 
 # Publish the package to pypi
 publish:
