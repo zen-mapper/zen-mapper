@@ -42,7 +42,7 @@ publish:
 
 # Clean up the working directory
 clean:
-	rm -rf dist/ docs/build/ result
+	rm -rf dist/ docs/build/ result ./docs/source/examples/
 	find src/ -type f -name "*.pyc" -delete
 	find src/ -type d -name "__pycache__" -delete
 
