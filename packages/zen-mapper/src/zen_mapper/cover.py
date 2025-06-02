@@ -5,6 +5,8 @@ import numpy.typing as npt
 
 from .types import Cover, CoverScheme
 
+__all__ = ["precomputed_cover", "rectangular_cover", "Width_Balanced_Cover"]
+
 logger = logging.getLogger("zen_mapper")
 
 

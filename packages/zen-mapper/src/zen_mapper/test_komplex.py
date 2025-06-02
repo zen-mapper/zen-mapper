@@ -12,12 +12,12 @@ from zen_mapper.types import Komplex, Simplex
 
 
 def test_empty():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         Simplex(())
 
 
 def test_repeats():
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         Simplex([1, 2, 3, 2])
 
 
