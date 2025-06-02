@@ -13,5 +13,7 @@ __all__ = [
     "to_networkx",
 ]
 
+__version__ = "0.3.0"
+
 logger = logging.getLogger("zen_mapper")
 logger.addHandler(logging.NullHandler())
