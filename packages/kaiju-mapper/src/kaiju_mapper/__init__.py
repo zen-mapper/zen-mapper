@@ -1,4 +1,5 @@
-from zen_mapper import mapper
+import zen_mapper as zm
+
 
 def hello() -> str:
-    return "Hello from kaiju-mapper!"
+    return f"Hello from kaiju-mapper! \n For {zm.__name__} {zm.__version__}"
