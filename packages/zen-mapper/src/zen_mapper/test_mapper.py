@@ -1,9 +1,9 @@
 import numpy as np
 from sklearn.cluster import DBSCAN
 
-from . import mapper
-from .cluster import sk_learn
+from .adapters import sk_learn
 from .cover import Width_Balanced_Cover, precomputed_cover
+from .mapper import mapper
 
 
 def test_mapper():

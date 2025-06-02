@@ -7,7 +7,8 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import frozensets, integers, sets
 
-from zen_mapper.komplex import Komplex, Simplex, _get_candidates, compute_nerve
+from zen_mapper.mapper import _get_candidates, compute_nerve
+from zen_mapper.types import Komplex, Simplex
 
 
 def test_empty():

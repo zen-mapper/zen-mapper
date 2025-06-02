@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.cluster import DBSCAN
 
-from .cluster import sk_learn
+from .adapters import sk_learn
 
 
 def test_sk_learn():

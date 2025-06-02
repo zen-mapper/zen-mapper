@@ -1,83 +1,85 @@
 import logging
-import sys
 from collections.abc import Iterable
 from itertools import chain, combinations, count
+from typing import TypeVar
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+import numpy as np
+
+from .types import Clusterer, CoverScheme, Komplex, MapperResult, Simplex
+
+__all__ = ["mapper"]
 
 logger = logging.getLogger("zen_mapper")
 
-
-class Simplex(tuple[int, ...]):
-    def __new__(cls, vertices: Iterable[int]):
-        _simplex = sorted(vertices)
-        assert len(_simplex) == len(set(_simplex)), (
-            "A simplex must not have repeated elements"
-        )
-        assert len(_simplex) != 0, "A simplex must have at least one vertex"
-        return super().__new__(cls, tuple(_simplex))
-
-    @property
-    def dim(self: Self) -> int:
-        """The dimension of the simplex
-
-        The dimension of a simplex is defined to be one less than the number of
-        elements in the simplex. Thus a 0-simplex (a vertex) is comprised of a
-        single point, a 1-simplex (an edge) is comprised of two points, and so
-        on.
-        """
-        return len(self) - 1
-
-    @property
-    def faces(self: Self) -> Iterable["Simplex"]:
-        """All the faces of a simplex
-
-        A simplex θ is a face of τ if and only if θ ⊆ τ. Note that as τ ⊆ τ
-        that τ is a face of τ!
-
-        Yields
-        ------
-        simplex
-            a face of the simplex
-        """
-        for i in range(1, len(self) + 1):
-            yield from map(Simplex, combinations(self, i))
-
-    @property
-    def vertices(self: Self) -> Iterable[int]:
-        yield from self
+M = TypeVar("M")
 
 
-class Komplex:
-    def __init__(self: Self, simplices: Iterable[Simplex] | None = None) -> None:
-        self._simplices: set[Simplex] = set(simplices) if simplices else set()
+def mapper(
+    data: np.ndarray,
+    projection: np.ndarray,
+    cover_scheme: CoverScheme,
+    clusterer: Clusterer[M],
+    dim: int | None,
+    min_intersection: int = 1,
+) -> MapperResult[M]:
+    """
+    Constructs a simplicial complex representation of the data.
 
-    def add(self: Self, simplex: Simplex) -> None:
-        self._simplices.add(simplex)
+    Parameters
+    ----------
+    data: np.ndarray
+    projection: np.ndarray
+        The output of the lens/filter function on the data. Must have the same
+        number of elements as data.
+    cover_scheme: CoverScheme
+        For cover generation. Should be a callable object that takes a
+        numpy array and returns a list of list(indices).
+    clusterer: Clusterer
+        A callable object that takes in a dataset and returns an iterator of
+        numpy arrays which contain indices for clustered points.
+    dim: int
+        The highest dimension of the mapper complex to compute.
+    min_intersection: int
+        The minimum intersection required between clusters to make a simplex.
 
-    @property
-    def dim(self: Self) -> int:
-        try:
-            return max(simplex.dim for simplex in self._simplices)
-        except ValueError:
-            return 0
+    Returns
+    -------
+    MapperResult
+        An object containing:
+        - nodes: List of clusters where each cluster is a list of data indices.
+        - nerve: A complete list of simplices.
+        - cover: List of list(indices) corresponding to elements of the cover.
+    """
+    assert len(data) == len(projection), (
+        "the entries in projection have to correspond to entries in data"
+    )
 
-    def __contains__(self: Self, simplex: Simplex) -> bool:
-        return simplex in self._simplices
+    nodes = list()
+    cover_id = list()
+    metadata = list()
 
-    def __getitem__(self: Self, ind: int) -> Iterable[Simplex]:
-        yield from (simplex for simplex in self._simplices if simplex.dim == ind)
+    cover_elements = map(np.array, cover_scheme(projection))
 
-    def __iter__(self: Self):
-        yield from self._simplices
+    for i, element in enumerate(cover_elements):
+        logger.info("Clustering cover element %d", i)
+        clusters, meta = clusterer(data[element])
+        metadata.append(meta)
+        new_nodes = [element[cluster] for cluster in clusters]
+        logger.info("Found %d clusters", len(new_nodes))
+        if new_nodes:
+            m = len(nodes)
+            n = len(new_nodes)
+            cover_id.append(list(range(m, m + n)))
+            nodes.extend(new_nodes)
+        else:
+            cover_id.append(list())
 
-    @property
-    def vertices(self: Self) -> Iterable[int]:
-        for simplex in self[0]:
-            yield from simplex.vertices
+    return MapperResult(
+        nodes=nodes,
+        nerve=compute_nerve(nodes, dim=dim, min_intersection=min_intersection),
+        cover=cover_id,
+        cluster_metadata=metadata,
+    )
 
 
 def compute_nerve(

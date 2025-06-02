@@ -1,28 +1,11 @@
 import logging
-import sys
-from collections.abc import Iterator
-from typing import Protocol
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
-
 
 import numpy as np
 import numpy.typing as npt
 
+from .types import Cover, CoverScheme
+
 logger = logging.getLogger("zen_mapper")
-
-
-class Cover(Protocol):
-    def __len__(self: Self) -> int: ...
-
-    def __iter__(self: Self) -> Iterator[npt.ArrayLike]: ...
-
-
-class CoverScheme(Protocol):
-    def __call__(self: Self, data: np.ndarray) -> Cover: ...
 
 
 def precomputed_cover(cover: Cover) -> CoverScheme:

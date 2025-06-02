@@ -1,5 +1,5 @@
 from zen_mapper.adapters import to_networkx
-from zen_mapper.komplex import Komplex, Simplex
+from zen_mapper.types import Komplex, Simplex
 
 
 def test_to_network_x():
