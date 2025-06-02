@@ -25,9 +25,9 @@ plt.show()
 # %%
 # Covering our data
 # =================
-from zen_mapper.cover import Width_Balanced_Cover
+import zen_mapper as zm
 
-cover_scheme = Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
+cover_scheme = zm.Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
 cover = cover_scheme(projection)
 
 # %%
@@ -35,17 +35,14 @@ cover = cover_scheme(projection)
 # ====================
 from sklearn.cluster import AffinityPropagation
 
-from zen_mapper.cluster import sk_learn
-
 sk = AffinityPropagation()
-clusterer = sk_learn(sk)
+clusterer = zm.sk_learn(sk)
 
 # %%
 # Computing the mapper graph
 # ==========================
-from zen_mapper import mapper
 
-result = mapper(
+result = zm.mapper(
     data=data,
     projection=projection,
     cover_scheme=cover_scheme,

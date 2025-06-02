@@ -26,9 +26,9 @@ plt.show()
 # %%
 # Covering our data
 # =================
-from zen_mapper.cover import Width_Balanced_Cover
+import zen_mapper as zm
 
-cover_scheme = Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
+cover_scheme = zm.Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
 cover = cover_scheme(projection)
 
 
@@ -60,21 +60,18 @@ plt.show()
 # ====================
 from sklearn.cluster import AgglomerativeClustering
 
-from zen_mapper.cluster import sk_learn
-
 sk = AgglomerativeClustering(
     linkage="single",
     n_clusters=None,
     distance_threshold=0.2,
 )
-clusterer = sk_learn(sk)
+clusterer = zm.sk_learn(sk)
 
 # %%
 # Computing the mapper graph
 # ==========================
-from zen_mapper import mapper
 
-result = mapper(
+result = zm.mapper(
     data=data,
     projection=projection,
     cover_scheme=cover_scheme,
@@ -87,7 +84,5 @@ result = mapper(
 # ============================
 import networkx as nx
 
-from zen_mapper.adapters import to_networkx
-
-graph = to_networkx(result.nerve)
+graph = zm.to_networkx(result.nerve)
 nx.draw(graph)

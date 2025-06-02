@@ -25,9 +25,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-from zen_mapper import mapper
-from zen_mapper.adapters import to_networkx
-from zen_mapper.cover import Width_Balanced_Cover
+import zen_mapper as zm
 
 
 def neighbor_counts(epsilon: float, data: np.ndarray) -> np.ndarray:
@@ -147,11 +145,11 @@ plt.show()
 #
 # Now we have a clusterer compatible with zen-mapper.
 
-cover_scheme = Width_Balanced_Cover(n_elements=5, percent_overlap=0.25)
+cover_scheme = zm.Width_Balanced_Cover(n_elements=5, percent_overlap=0.25)
 cover = cover_scheme(data)
 projection = data[:, 0]
 
-result = mapper(
+result = zm.mapper(
     data=data,
     projection=projection,
     cover_scheme=cover_scheme,
@@ -159,7 +157,7 @@ result = mapper(
     dim=1,
 )
 
-graph = to_networkx(result.nerve)
+graph = zm.to_networkx(result.nerve)
 
 # plot the mapper graph
 nx.draw_kamada_kawai(graph)

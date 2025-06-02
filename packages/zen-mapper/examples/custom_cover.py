@@ -17,7 +17,8 @@ actual implementation of the cover itself and there may be better ways.
 
 import numpy as np
 
-from zen_mapper.cover import Cover
+import zen_mapper as zm
+from zen_mapper.types import Cover
 
 
 def epsilon_net(centers, epsilon, data) -> Cover:
@@ -154,10 +155,7 @@ def trivial(data: np.ndarray):
 
 import networkx as nx
 
-from zen_mapper import mapper
-from zen_mapper.adapters import to_networkx
-
-result = mapper(
+result = zm.mapper(
     data=data,
     projection=data,
     cover_scheme=Greedy_Epsilon_Net(1),
@@ -165,6 +163,6 @@ result = mapper(
     dim=1,
 )
 
-g = to_networkx(result.nerve)
+g = zm.to_networkx(result.nerve)
 nx.draw_kamada_kawai(g)
 plt.show()
