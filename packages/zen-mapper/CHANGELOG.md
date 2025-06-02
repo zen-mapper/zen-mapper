@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Komplex now has a `__len__` method which reports how many simplices are in
+  the complex.
 - Mapper now takes a `min_intersection` parameter to allow specifying the
   overlap in the nerve.
 - `zen_mapper.cover.precomputed_cover` was added which allows specifying a
@@ -16,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Change
 
+- Reorganized the entire package to allow for less painful imports. Everything
+  is now accesible from the top level module `zen_mapper`
 - The cover protocol previously required being an iterable of numpy arrays.
   This was loosened to allow for iterables of anything which is convertible to
   a numpy array.
