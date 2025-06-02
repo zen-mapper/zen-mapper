@@ -226,6 +226,9 @@ class Komplex:
         except ValueError:
             return 0
 
+    def __len__(self: Self) -> int:
+        return self._simplices.__len__()
+
     def __contains__(self: Self, simplex: Simplex) -> bool:
         """
         Checks if a given simplex is present in the complex.
