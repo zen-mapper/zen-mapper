@@ -1,26 +1,17 @@
 import logging
 import sys
-from collections.abc import Iterator
-from typing import Protocol, List
+from typing import List
+
 import numpy as np
 from scipy.stats import anderson
 from sklearn.mixture import GaussianMixture
+from zen_mapper.types import Cover
 
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
 logger = logging.getLogger("zen_mapper")
-
-
-class Cover(Protocol):
-    def __len__(self: Self) -> int: ...
-
-    def __iter__(self: Self) -> Iterator[np.ndarray]: ...
-
-
-class CoverScheme(Protocol):
-    def __call__(self: Self, data: np.ndarray) -> Cover: ...
 
 
 class GMapperCover:
