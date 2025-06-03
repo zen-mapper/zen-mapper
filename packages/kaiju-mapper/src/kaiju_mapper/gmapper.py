@@ -1,5 +1,4 @@
 import logging
-import sys
 from typing import List
 
 import numpy as np
@@ -7,10 +6,6 @@ from scipy.stats import anderson
 from sklearn.mixture import GaussianMixture
 from zen_mapper.types import Cover
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 logger = logging.getLogger("zen_mapper")
 
 
