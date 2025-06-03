@@ -76,7 +76,7 @@ class GMapperCover:
         initial_intervals = np.array([[np.min(lens), np.max(lens)]])
         result_intervals = self._gmeans_algorithm(lens, initial_intervals)
 
-        return GMapperCoverResult(result_intervals, data)
+        return compute_covers(result_intervals, data)
 
     def _gmeans_algorithm(self, lens, initial_intervals):
         intervals = initial_intervals.copy()
@@ -394,34 +394,16 @@ class GMapperCover:
         return new_intervals, interval_membership
 
 
-class GMapperCoverResult:
-    """
-    Result of G-Mapper cover which fits protocol.
-    """
+def compute_covers(intervals: np.ndarray, data: np.ndarray) -> List[np.ndarray]:
+    if len(data.shape) > 1 and data.shape[1] > 1:
+        lens = data[:, 0]
+    else:
+        lens = data.flatten()
 
-    def __init__(self, intervals: np.ndarray, data: np.ndarray):
-        self.intervals = intervals
-        self.data = data
-        self._covers = self._compute_covers()
-
-    def _compute_covers(self) -> List[np.ndarray]:
-        covers = []
-        for interval in self.intervals:
-            if len(self.data.shape) > 1 and self.data.shape[1] > 1:
-                lens = self.data[:, 0]
-            else:
-                lens = self.data.flatten()
-
-            indices = np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
-            covers.append(indices)
-        return covers
-
-    def __len__(self) -> int:
-        return len(self._covers)
-
-    def __iter__(self) -> Iterator[np.ndarray]:
-        for cover in self._covers:
-            yield cover
+    return [
+        np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
+        for interval in intervals
+    ]
 
 
 class CoverObj:
