@@ -1,4 +1,5 @@
 import logging
+import operator
 from typing import List
 
 import numpy as np
@@ -74,218 +75,177 @@ class GMapperCover:
         return compute_covers(result_intervals, data)
 
     def _gmeans_algorithm(self, lens, initial_intervals):
-        intervals = initial_intervals.copy()
-        check_interval = [True for _ in range(len(intervals))]
+        if self.method == "DFS":
+            return self._dfs(lens, initial_intervals)
+        elif self.method == "BFS":
+            return self._bfs(lens, initial_intervals)
+        elif self.method == "randomized":
+            return self._randomized(lens, initial_intervals)
+
+        raise ValueError(f"Unknown method {self.method}")
+
+    def _randomized(self, lens, intervals):
         interval_membership = _membership(lens, intervals)
-        ad_scores = []
-        split_index = []
-
         for iteration in range(self.iterations):
-            modified = False
-
-            if self.method is None or self.method == "DFS":
-                for i in range(len(intervals)):
-                    if not check_interval[i]:
-                        continue
-
-                    if len(interval_membership[i]) == 0:
-                        check_interval[i] = False
-                        continue
-
-                    if ad_test(interval_membership[i]) > self.ad_threshold:
-                        check_interval[i] = True
-                        check_interval.insert(i + 1, True)
-                        tem = len(interval_membership[i])
-
-                        new_intervals, interval_membership = _split(
-                            interval_membership, intervals, self.g_overlap, i
-                        )
-                        intervals = new_intervals
-
-                        if tem == len(interval_membership[i]):
-                            check_interval[i] = False
-                            continue
-                        if tem == len(interval_membership[i + 1]):
-                            check_interval[i + 1] = False
-                            continue
-
-                        ad_scores = [
-                            ad_test(interval_membership[i]),
-                            ad_test(interval_membership[i + 1]),
-                        ]
-
-                        if ad_scores[1] > ad_scores[0]:
-                            temp = intervals[i + 1].copy()
-                            intervals = np.delete(intervals, i + 1, axis=0)
-                            intervals = np.insert(intervals, i, [temp], axis=0)
-
-                            temp = interval_membership[i + 1]
-                            interval_membership.pop(i + 1)
-                            interval_membership.insert(i, temp)
-
-                        modified = True
-                        break
-                    else:
-                        check_interval[i] = False
-
-                if not modified:
-                    logger.info(f"Convergence after {iteration} iterations.")
-                    return intervals
-
-            elif self.method == "BFS":
-                if len(ad_scores) == 0:
-                    for i in range(len(intervals)):
-                        if not check_interval[i]:
-                            continue
-
-                        if len(interval_membership[i]) == 0:
-                            check_interval[i] = False
-                            continue
-
-                        if ad_test(interval_membership[i]) > self.ad_threshold:
-                            split_index.append(i)
-                            ad_scores.append(ad_test(interval_membership[i]))
-                            modified = True
-                        else:
-                            check_interval[i] = False
-
-                    if not modified:
-                        logger.info(f"Convergence after {iteration} iterations.")
-                        return intervals
-
-                    ad_scores = [0 if x != x else x for x in ad_scores]  # Handle NaN
-
-                    if max(ad_scores) == 0:
-                        logger.info(f"Convergence after {iteration} iterations.")
-                        return intervals
-
-                    best_split = ad_scores.index(max(ad_scores))
-                    j = split_index[best_split]
-                    check_interval[j] = True
-                    check_interval.insert(j + 1, True)
-
-                    new_intervals, interval_membership = _split(
-                        interval_membership, intervals, self.g_overlap, j
-                    )
-                    intervals = new_intervals
-
-                    del ad_scores[best_split]
-                    del split_index[best_split]
-
-                else:
-                    for i in range(len(intervals)):
-                        if not check_interval[i]:
-                            continue
-
-                        if len(interval_membership[i]) == 0:
-                            check_interval[i] = True
-                            continue
-
-                        if ad_test(interval_membership[i]) > self.ad_threshold:
-                            modified = True
-                        else:
-                            check_interval[i] = False
-
-                    if not modified:
-                        logger.info(f"Convergence after {iteration} iterations.")
-                        return intervals
-
-                    ad_scores = [0 if x != x else x for x in ad_scores]  # Handle NaN
-
-                    if max(ad_scores) == 0:
-                        logger.info(f"Convergence after {iteration} iterations.")
-                        return intervals
-
-                    best_split = ad_scores.index(max(ad_scores))
-                    j = split_index[best_split]
-                    check_interval[j] = True
-                    check_interval.insert(j + 1, True)
-
-                    new_intervals, interval_membership = _split(
-                        interval_membership, intervals, self.g_overlap, j
-                    )
-                    intervals = new_intervals
-
-                    del ad_scores[best_split]
-                    del split_index[best_split]
-
-            elif self.method == "randomized":
-                all_elements_idx = [i for i in range(len(intervals))]
-                element_ad_scores = [
-                    ad_test(interval_membership[i]) for i in range(len(intervals))
-                ]
-                element_ad_scores = [
-                    0 if x != x else x for x in element_ad_scores
-                ]  # Handle NaN
-
-                if sum(element_ad_scores) == 0:
-                    logger.info(
-                        f"Convergence after {iteration} iterations - all AD scores are zero."
-                    )
-                    return intervals
-
-                found_valid = False
-                while not found_valid and len(all_elements_idx) > 0:
-                    # Sample one of the intervals weighted by ad score
-                    weights = np.asarray(element_ad_scores)[all_elements_idx]
-                    if weights.sum() == 0:
-                        # If all weights are zero, use uniform weights
-                        weights = np.ones_like(weights) / len(weights)
-                    else:
-                        weights = weights / weights.sum()
-
-                    current_element = int(
-                        np.random.choice(np.asarray(all_elements_idx), p=weights)
-                    )
-                    j = current_element
-
-                    if len(interval_membership[j]) == 0:
-                        removal_idx = all_elements_idx.index(j)
-                        all_elements_idx.pop(removal_idx)
-                        continue
-
-                    if ad_test(interval_membership[j]) > self.ad_threshold:
-                        check_interval[j] = True
-                        check_interval.insert(j + 1, True)
-
-                        new_intervals, interval_membership = _split(
-                            interval_membership, intervals, self.g_overlap, j
-                        )
-                        intervals = new_intervals
-
-                        found_valid = True
-                    else:
-                        removal_idx = all_elements_idx.index(j)
-                        all_elements_idx.pop(removal_idx)
-
-                if not found_valid:
-                    logger.info(
-                        f"Convergence after {iteration} iterations - no valid splits found."
-                    )
-                    return intervals
-
-            if len(intervals) > self.max_intervals:
+            if len(intervals) >= self.max_intervals:
                 logger.info(
                     f"Reached maximum number of intervals ({self.max_intervals})."
                 )
                 break
 
+            all_elements_idx = np.ones(len(intervals), dtype=bool)
+            element_ad_scores = [
+                ad_test(interval_membership[i]) for i in range(len(intervals))
+            ]
+            element_ad_scores = [
+                0 if np.isnan(x) else x for x in element_ad_scores
+            ]  # Handle NaN
+
+            if sum(element_ad_scores) == 0:
+                logger.info(
+                    f"Convergence after {iteration} iterations - all AD scores are zero."
+                )
+                break
+
+            found_valid = False
+            while not found_valid and np.any(all_elements_idx):
+                # Sample one of the intervals weighted by ad score
+                weights = np.asarray(element_ad_scores)[all_elements_idx]
+
+                if weights.sum() == 0:
+                    weights = None
+                else:
+                    weights /= weights.sum()
+
+                current_element = np.random.choice(
+                    np.asarray(np.flatnonzero(all_elements_idx), dtype=int),
+                    p=weights,
+                )
+
+                if len(interval_membership[current_element]) == 0:
+                    all_elements_idx[current_element] = False
+                    continue
+
+                if ad_test(interval_membership[current_element]) > self.ad_threshold:
+
+                    new_intervals, interval_membership = _split(
+                        interval_membership, intervals, self.g_overlap, current_element
+                    )
+                    intervals = new_intervals
+
+                    found_valid = True
+                else:
+                    all_elements_idx[current_element] = False
+
+            if not found_valid:
+                logger.info(
+                    f"Convergence after {iteration} iterations - no valid splits found."
+                )
+                break
+
+        return intervals
+
+    def _bfs(self, lens, intervals):
+        check_interval = set(range(len(intervals)))
+        interval_membership = _membership(lens, intervals)
+        ad_scores: dict[int, float] = dict()
+
+        for iteration in range(self.iterations):
+            append_scores = len(ad_scores) == 0
+            for i in check_interval:
+                test_result = ad_test(interval_membership[i])
+
+                if test_result <= self.ad_threshold:
+                    check_interval.remove(i)
+                    continue
+
+                if append_scores:
+                    ad_scores[i] = test_result
+
+            if not check_interval:
+                logger.info(f"Convergence after {iteration} iterations.")
+                break
+
+            best_split, score = max(ad_scores.items(), key=operator.itemgetter(1))
+
+            if score == 0:
+                logger.info(f"Convergence after {iteration} iterations.")
+                break
+
+            check_interval.add(best_split)
+            check_interval.add(best_split + 1)
+
+            intervals, interval_membership = _split(
+                interval_membership, intervals, self.g_overlap, best_split
+            )
+
+            del ad_scores[best_split]
+
+        return intervals
+
+    def _dfs(self, lens, intervals):
+        check_interval = set(range(len(intervals)))
+        interval_membership = _membership(lens, intervals)
+        for iteration in range(self.iterations):
+            if len(intervals) >= self.max_intervals:
+                logger.info(
+                    f"Reached maximum number of intervals ({self.max_intervals})."
+                )
+                break
+
+            to_split = None
+            for i in check_interval:
+                if ad_test(interval_membership[i]) > self.ad_threshold:
+                    to_split = i
+                    break
+                check_interval.remove(i)
+
+            if to_split is None:
+                logger.info(f"Convergence after {iteration} iterations.")
+                break
+
+            previous_length = len(interval_membership[to_split])
+
+            intervals, interval_membership = _split(
+                interval_membership, intervals, self.g_overlap, to_split
+            )
+
+            left, right = to_split, to_split + 1
+            check_interval.add(right)
+
+            left_members = interval_membership[left]
+            right_members = interval_membership[right]
+
+            if previous_length == len(left_members):
+                check_interval.remove(left)
+                continue
+
+            if previous_length == len(right_members):
+                check_interval.remove(right)
+                continue
+
+            if ad_test(right_members) > ad_test(left_members):
+                intervals = np.delete(intervals, right, axis=0)
+                intervals = np.insert(intervals, left, [right_members.copy()], axis=0)
+
+                interval_membership.pop(right)
+                interval_membership.insert(left, left_members.copy())
+
         return intervals
 
 
 def _split(interval_membership, intervals, g_overlap, index):
-    j = index
     split_interval = _gm_split(
-        intervals[j], np.array(interval_membership[j]), g_overlap
+        intervals[index], np.array(interval_membership[index]), g_overlap
     )
 
-    new_intervals = np.delete(intervals, j, axis=0)
-    new_intervals = np.insert(new_intervals, j, split_interval, axis=0)
+    new_intervals = np.delete(intervals, index, axis=0)
+    new_intervals = np.insert(new_intervals, index, split_interval, axis=0)
 
-    new_membership = _membership(interval_membership[j], split_interval)
-    interval_membership.pop(j)
-    interval_membership.insert(j, new_membership[0])
-    interval_membership.insert(j + 1, new_membership[1])
+    new_membership = _membership(interval_membership[index], split_interval)
+    interval_membership.pop(index)
+    interval_membership.insert(index, new_membership[0])
+    interval_membership.insert(index + 1, new_membership[1])
 
     return new_intervals, interval_membership
 
