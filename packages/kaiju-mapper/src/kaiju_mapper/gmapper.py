@@ -85,13 +85,11 @@ class GMapperCover:
         ad_scores = []
         split_index = []
 
-        cover = CoverObj(intervals)
-
         for iteration in range(self.iterations):
             modified = False
 
             if self.method is None or self.method == "DFS":
-                for i in range(len(cover.intervals)):
+                for i in range(len(intervals)):
                     if not check_interval[i]:
                         continue
 
@@ -105,9 +103,9 @@ class GMapperCover:
                         tem = len(interval_membership[i])
 
                         new_intervals, interval_membership = self._split(
-                            interval_membership, cover.intervals, self.g_overlap, i
+                            interval_membership, intervals, self.g_overlap, i
                         )
-                        cover.intervals = new_intervals
+                        intervals = new_intervals
 
                         if tem == len(interval_membership[i]):
                             check_interval[i] = False
@@ -122,10 +120,10 @@ class GMapperCover:
                         ]
 
                         if ad_scores[1] > ad_scores[0]:
-                            temp = cover.intervals[i + 1].copy()
-                            cover.intervals = np.delete(cover.intervals, i + 1, axis=0)
-                            cover.intervals = np.insert(
-                                cover.intervals, i, [temp], axis=0
+                            temp = intervals[i + 1].copy()
+                            intervals = np.delete(intervals, i + 1, axis=0)
+                            intervals = np.insert(
+                                intervals, i, [temp], axis=0
                             )
 
                             temp = interval_membership[i + 1]
@@ -139,11 +137,11 @@ class GMapperCover:
 
                 if not modified:
                     logger.info(f"Convergence after {iteration} iterations.")
-                    return cover.intervals
+                    return intervals
 
             elif self.method == "BFS":
                 if len(ad_scores) == 0:
-                    for i in range(len(cover.intervals)):
+                    for i in range(len(intervals)):
                         if not check_interval[i]:
                             continue
 
@@ -160,13 +158,13 @@ class GMapperCover:
 
                     if not modified:
                         logger.info(f"Convergence after {iteration} iterations.")
-                        return cover.intervals
+                        return intervals
 
                     ad_scores = [0 if x != x else x for x in ad_scores]  # Handle NaN
 
                     if max(ad_scores) == 0:
                         logger.info(f"Convergence after {iteration} iterations.")
-                        return cover.intervals
+                        return intervals
 
                     best_split = ad_scores.index(max(ad_scores))
                     j = split_index[best_split]
@@ -174,15 +172,15 @@ class GMapperCover:
                     check_interval.insert(j + 1, True)
 
                     new_intervals, interval_membership = self._split(
-                        interval_membership, cover.intervals, self.g_overlap, j
+                        interval_membership, intervals, self.g_overlap, j
                     )
-                    cover.intervals = new_intervals
+                    intervals = new_intervals
 
                     del ad_scores[best_split]
                     del split_index[best_split]
 
                 else:
-                    for i in range(len(cover.intervals)):
+                    for i in range(len(intervals)):
                         if not check_interval[i]:
                             continue
 
@@ -197,13 +195,13 @@ class GMapperCover:
 
                     if not modified:
                         logger.info(f"Convergence after {iteration} iterations.")
-                        return cover.intervals
+                        return intervals
 
                     ad_scores = [0 if x != x else x for x in ad_scores]  # Handle NaN
 
                     if max(ad_scores) == 0:
                         logger.info(f"Convergence after {iteration} iterations.")
-                        return cover.intervals
+                        return intervals
 
                     best_split = ad_scores.index(max(ad_scores))
                     j = split_index[best_split]
@@ -211,18 +209,18 @@ class GMapperCover:
                     check_interval.insert(j + 1, True)
 
                     new_intervals, interval_membership = self._split(
-                        interval_membership, cover.intervals, self.g_overlap, j
+                        interval_membership, intervals, self.g_overlap, j
                     )
-                    cover.intervals = new_intervals
+                    intervals = new_intervals
 
                     del ad_scores[best_split]
                     del split_index[best_split]
 
             elif self.method == "randomized":
-                all_elements_idx = [i for i in range(len(cover.intervals))]
+                all_elements_idx = [i for i in range(len(intervals))]
                 element_ad_scores = [
                     self.ad_test(interval_membership[i])
-                    for i in range(len(cover.intervals))
+                    for i in range(len(intervals))
                 ]
                 element_ad_scores = [
                     0 if x != x else x for x in element_ad_scores
@@ -232,7 +230,7 @@ class GMapperCover:
                     logger.info(
                         f"Convergence after {iteration} iterations - all AD scores are zero."
                     )
-                    return cover.intervals
+                    return intervals
 
                 found_valid = False
                 while not found_valid and len(all_elements_idx) > 0:
@@ -259,9 +257,9 @@ class GMapperCover:
                         check_interval.insert(j + 1, True)
 
                         new_intervals, interval_membership = self._split(
-                            interval_membership, cover.intervals, self.g_overlap, j
+                            interval_membership, intervals, self.g_overlap, j
                         )
-                        cover.intervals = new_intervals
+                        intervals = new_intervals
 
                         found_valid = True
                     else:
@@ -272,15 +270,15 @@ class GMapperCover:
                     logger.info(
                         f"Convergence after {iteration} iterations - no valid splits found."
                     )
-                    return cover.intervals
+                    return intervals
 
-            if len(cover.intervals) > self.max_intervals:
+            if len(intervals) > self.max_intervals:
                 logger.info(
                     f"Reached maximum number of intervals ({self.max_intervals})."
                 )
                 break
 
-        return cover.intervals
+        return intervals
 
     def ad_test(self, data):
         """
@@ -404,8 +402,3 @@ def compute_covers(intervals: np.ndarray, data: np.ndarray) -> List[np.ndarray]:
         np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
         for interval in intervals
     ]
-
-
-class CoverObj:
-    def __init__(self, intervals):
-        self.intervals = intervals
