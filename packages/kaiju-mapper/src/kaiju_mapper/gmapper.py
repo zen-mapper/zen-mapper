@@ -81,7 +81,7 @@ class GMapperCover:
     def _gmeans_algorithm(self, lens, initial_intervals):
         intervals = initial_intervals.copy()
         check_interval = [True for _ in range(len(intervals))]
-        interval_membership = self._membership(lens, intervals)
+        interval_membership = _membership(lens, intervals)
         ad_scores = []
         split_index = []
 
@@ -97,12 +97,12 @@ class GMapperCover:
                         check_interval[i] = False
                         continue
 
-                    if self.ad_test(interval_membership[i]) > self.ad_threshold:
+                    if ad_test(interval_membership[i]) > self.ad_threshold:
                         check_interval[i] = True
                         check_interval.insert(i + 1, True)
                         tem = len(interval_membership[i])
 
-                        new_intervals, interval_membership = self._split(
+                        new_intervals, interval_membership = _split(
                             interval_membership, intervals, self.g_overlap, i
                         )
                         intervals = new_intervals
@@ -115,16 +115,14 @@ class GMapperCover:
                             continue
 
                         ad_scores = [
-                            self.ad_test(interval_membership[i]),
-                            self.ad_test(interval_membership[i + 1]),
+                            ad_test(interval_membership[i]),
+                            ad_test(interval_membership[i + 1]),
                         ]
 
                         if ad_scores[1] > ad_scores[0]:
                             temp = intervals[i + 1].copy()
                             intervals = np.delete(intervals, i + 1, axis=0)
-                            intervals = np.insert(
-                                intervals, i, [temp], axis=0
-                            )
+                            intervals = np.insert(intervals, i, [temp], axis=0)
 
                             temp = interval_membership[i + 1]
                             interval_membership.pop(i + 1)
@@ -149,9 +147,9 @@ class GMapperCover:
                             check_interval[i] = False
                             continue
 
-                        if self.ad_test(interval_membership[i]) > self.ad_threshold:
+                        if ad_test(interval_membership[i]) > self.ad_threshold:
                             split_index.append(i)
-                            ad_scores.append(self.ad_test(interval_membership[i]))
+                            ad_scores.append(ad_test(interval_membership[i]))
                             modified = True
                         else:
                             check_interval[i] = False
@@ -171,7 +169,7 @@ class GMapperCover:
                     check_interval[j] = True
                     check_interval.insert(j + 1, True)
 
-                    new_intervals, interval_membership = self._split(
+                    new_intervals, interval_membership = _split(
                         interval_membership, intervals, self.g_overlap, j
                     )
                     intervals = new_intervals
@@ -188,7 +186,7 @@ class GMapperCover:
                             check_interval[i] = True
                             continue
 
-                        if self.ad_test(interval_membership[i]) > self.ad_threshold:
+                        if ad_test(interval_membership[i]) > self.ad_threshold:
                             modified = True
                         else:
                             check_interval[i] = False
@@ -208,7 +206,7 @@ class GMapperCover:
                     check_interval[j] = True
                     check_interval.insert(j + 1, True)
 
-                    new_intervals, interval_membership = self._split(
+                    new_intervals, interval_membership = _split(
                         interval_membership, intervals, self.g_overlap, j
                     )
                     intervals = new_intervals
@@ -219,8 +217,7 @@ class GMapperCover:
             elif self.method == "randomized":
                 all_elements_idx = [i for i in range(len(intervals))]
                 element_ad_scores = [
-                    self.ad_test(interval_membership[i])
-                    for i in range(len(intervals))
+                    ad_test(interval_membership[i]) for i in range(len(intervals))
                 ]
                 element_ad_scores = [
                     0 if x != x else x for x in element_ad_scores
@@ -252,11 +249,11 @@ class GMapperCover:
                         all_elements_idx.pop(removal_idx)
                         continue
 
-                    if self.ad_test(interval_membership[j]) > self.ad_threshold:
+                    if ad_test(interval_membership[j]) > self.ad_threshold:
                         check_interval[j] = True
                         check_interval.insert(j + 1, True)
 
-                        new_intervals, interval_membership = self._split(
+                        new_intervals, interval_membership = _split(
                             interval_membership, intervals, self.g_overlap, j
                         )
                         intervals = new_intervals
@@ -280,116 +277,117 @@ class GMapperCover:
 
         return intervals
 
-    def ad_test(self, data):
-        """
-        Anderson-Darling Test for normality.
 
-        Parameters
-        ----------
-        data : list or np.ndarray
-            Data points to test for normality
+def _split(interval_membership, intervals, g_overlap, index):
+    j = index
+    split_interval = _gm_split(
+        intervals[j], np.array(interval_membership[j]), g_overlap
+    )
 
-        Returns
-        -------
-        float
-            Anderson-Darling test statistic (corrected)
-        """
-        n = len(data)
+    new_intervals = np.delete(intervals, j, axis=0)
+    new_intervals = np.insert(new_intervals, j, split_interval, axis=0)
 
-        if n == 0:
-            return 0
-        try:
-            and_corrected = anderson(data)[0] * (1 + 4 / n - 25 / (n**2))
-            return and_corrected
-        except Exception as e:
-            logger.warning(f"Anderson-Darling test failed: {e}")
-            return 0
+    new_membership = _membership(interval_membership[j], split_interval)
+    interval_membership.pop(j)
+    interval_membership.insert(j, new_membership[0])
+    interval_membership.insert(j + 1, new_membership[1])
 
-    def _gm_split(self, interval, membership_data, g_overlap):
-        if len(membership_data) == 0:
-            mid = (interval[0] + interval[1]) / 2
-            return np.array([[interval[0], mid], [mid, interval[1]]])
+    return new_intervals, interval_membership
 
-        c = np.mean(membership_data)
-        std = np.std(membership_data, ddof=1)
 
-        if std == 0:
-            mid = (interval[0] + interval[1]) / 2
-            return np.array([[interval[0], mid], [mid, interval[1]]])
+def _membership(data, intervals):
+    """
+    Assign data points to intervals.
 
-        m = np.sqrt(2 / np.pi) * std
-        c1 = c + m
-        c2 = c - m
+    Returns
+    -------
+    list
+        List of lists containing data points for each interval
+    """
+    return [
+        [x for x in data if interval[0] <= x <= interval[1]] for interval in intervals
+    ]
 
-        L = np.array(membership_data).reshape(-1, 1)
 
-        try:
-            gmm = GaussianMixture(
-                n_components=2, means_init=[[c1], [c2]], covariance_type="full"
-            ).fit(L)
+def ad_test(data):
+    """
+    Anderson-Darling Test for normality.
 
-            left_index = np.argmin(gmm.means_)
-            left_mean = np.min(gmm.means_)
-            left_std = np.sqrt(gmm.covariances_[left_index])[0][0]
+    Parameters
+    ----------
+    data : list or np.ndarray
+        Data points to test for normality
 
-            right_index = np.argmax(gmm.means_)
-            right_mean = np.max(gmm.means_)
-            right_std = np.sqrt(gmm.covariances_[right_index])[0][0]
+    Returns
+    -------
+    float
+        Anderson-Darling test statistic (corrected)
+    """
+    n = len(data)
 
-            # calculate split point and overlap
-            split_factor = (1 + g_overlap) * left_std / (left_std + right_std)
-            split_point = left_mean + split_factor * (right_mean - left_mean)
-            left_interval = [interval[0], min(split_point, interval[1])]
-            right_interval = [
-                max(
-                    interval[0],
-                    right_mean
-                    - (1 + g_overlap)
-                    * right_std
-                    / (left_std + right_std)
-                    * (right_mean - left_mean),
-                ),
-                interval[1],
-            ]
+    if n == 0:
+        return 0
+    try:
+        and_corrected = anderson(data)[0] * (1 + 4 / n - 25 / (n**2))
+        return and_corrected
+    except Exception as e:
+        logger.warning(f"Anderson-Darling test failed: {e}")
+        return 0
 
-            return np.array([left_interval, right_interval])
 
-        except Exception as e:
-            logger.warning(f"GMM fitting failed: {e}. Falling back to simple split...")
-            mid = (interval[0] + interval[1]) / 2
-            return np.array([[interval[0], mid], [mid, interval[1]]])
+def _gm_split(interval, membership_data, g_overlap):
+    if len(membership_data) == 0:
+        mid = (interval[0] + interval[1]) / 2
+        return np.array([[interval[0], mid], [mid, interval[1]]])
 
-    def _membership(self, data, intervals):
-        """
-        Assign data points to intervals.
+    c = np.mean(membership_data)
+    std = np.std(membership_data, ddof=1)
 
-        Returns
-        -------
-        list
-            List of lists containing data points for each interval
-        """
-        membership = [[] for _ in range(len(intervals))]
-        for i in range(len(data)):
-            for j in range(len(intervals)):
-                if (data[i] >= intervals[j][0]) and (data[i] <= intervals[j][1]):
-                    membership[j].append(data[i])
-        return membership
+    if std == 0:
+        mid = (interval[0] + interval[1]) / 2
+        return np.array([[interval[0], mid], [mid, interval[1]]])
 
-    def _split(self, interval_membership, intervals, g_overlap, index):
-        j = index
-        split_interval = self._gm_split(
-            intervals[j], np.array(interval_membership[j]), g_overlap
-        )
+    m = np.sqrt(2 / np.pi) * std
+    c1 = c + m
+    c2 = c - m
 
-        new_intervals = np.delete(intervals, j, axis=0)
-        new_intervals = np.insert(new_intervals, j, split_interval, axis=0)
+    L = np.array(membership_data).reshape(-1, 1)
 
-        new_membership = self._membership(interval_membership[j], split_interval)
-        interval_membership.pop(j)
-        interval_membership.insert(j, new_membership[0])
-        interval_membership.insert(j + 1, new_membership[1])
+    try:
+        gmm = GaussianMixture(
+            n_components=2, means_init=[[c1], [c2]], covariance_type="full"
+        ).fit(L)
 
-        return new_intervals, interval_membership
+        left_index = np.argmin(gmm.means_)
+        left_mean = np.min(gmm.means_)
+        left_std = np.sqrt(gmm.covariances_[left_index])[0][0]
+
+        right_index = np.argmax(gmm.means_)
+        right_mean = np.max(gmm.means_)
+        right_std = np.sqrt(gmm.covariances_[right_index])[0][0]
+
+        # calculate split point and overlap
+        split_factor = (1 + g_overlap) * left_std / (left_std + right_std)
+        split_point = left_mean + split_factor * (right_mean - left_mean)
+        left_interval = [interval[0], min(split_point, interval[1])]
+        right_interval = [
+            max(
+                interval[0],
+                right_mean
+                - (1 + g_overlap)
+                * right_std
+                / (left_std + right_std)
+                * (right_mean - left_mean),
+            ),
+            interval[1],
+        ]
+
+        return np.array([left_interval, right_interval])
+
+    except Exception as e:
+        logger.warning(f"GMM fitting failed: {e}. Falling back to simple split...")
+        mid = (interval[0] + interval[1]) / 2
+        return np.array([[interval[0], mid], [mid, interval[1]]])
 
 
 def compute_covers(intervals: np.ndarray, data: np.ndarray) -> List[np.ndarray]:
