@@ -72,7 +72,10 @@ class GMapperCover:
         initial_intervals = np.array([[np.min(lens), np.max(lens)]])
         result_intervals = self._gmeans_algorithm(lens, initial_intervals)
 
-        return compute_covers(result_intervals, data)
+        return [
+            np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
+            for interval in result_intervals
+        ]
 
     def _gmeans_algorithm(self, lens, initial_intervals):
         if self.method == "DFS":
@@ -343,15 +346,3 @@ def _gm_split(interval, membership_data, g_overlap):
         logger.warning(f"GMM fitting failed: {e}. Falling back to simple split...")
         mid = (interval[0] + interval[1]) / 2
         return np.array([[interval[0], mid], [mid, interval[1]]])
-
-
-def compute_covers(intervals: np.ndarray, data: np.ndarray) -> List[np.ndarray]:
-    if len(data.shape) > 1 and data.shape[1] > 1:
-        lens = data[:, 0]
-    else:
-        lens = data.flatten()
-
-    return [
-        np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
-        for interval in intervals
-    ]
