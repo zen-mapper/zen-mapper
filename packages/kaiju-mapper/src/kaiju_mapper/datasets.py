@@ -100,3 +100,45 @@ def simplex(
     # np.linalg.matrix_rank()
     barycentric = unit_simplex(dim, num_samples, closed, seed)
     return np.matmul(simplex.T, barycentric[:, :, np.newaxis]).squeeze()
+
+
+def sphere(
+    dim: int,
+    radius: float = 1,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    """Sample uniformly from an n-sphere
+
+    This uses the algorithm described in Muller _[1].
+
+    Parameters
+    ----------
+    dim : np.ndarray
+        The dimension of the sphere to sample from.
+    radius : float
+        The radius of the sphere to sample from.
+    num_samples : int
+        Number of points to sample.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, dim+1), with the rows corresponding to
+    individual samples.
+
+    .. [1] Mervin E. Muller, "A Note on a Method for Generating Points
+    Uniformly on N-Dimensional Spheres" 1959.
+    """
+    if num_samples < 1:
+        raise ValueError("num_samples must be > 0")
+
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    rng = np.random.default_rng(seed)
+
+    result = rng.normal(size=(num_samples, dim + 1))
+    result /= np.linalg.norm(result, axis=1)[:, np.newaxis]
+    return result
