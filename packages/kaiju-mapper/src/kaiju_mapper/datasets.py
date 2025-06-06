@@ -108,7 +108,7 @@ def unit_simplex(
     ----------
     dim : int
         Dimension of simplex to sample from.
-    N : int
+    num_samples : int
         Number of points to sample.
     closed : bool
         If true, the region sampled includes the boundary of the simplex.
@@ -148,3 +148,43 @@ def unit_simplex(
         result = (result - 1) / (M - n)
 
     return result
+
+
+def simplex(
+    simplex: npt.ArrayLike,
+    num_samples: int = 1,
+    closed: bool = True,
+    seed: Seed = None,
+) -> np.ndarray:
+    """Sample uniformly from an arbitrary n-simplex
+
+
+    Parameters
+    ----------
+    simplex : np.ndarray
+        The simplex to sample from. The simplex is encoded as a 2d numpy array
+        who's rows are the vertices of the simplex.
+    num_samples : int
+        Number of points to sample.
+    closed : bool
+        If true, the region sampled includes the boundary of the simplex.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, dim+1), with the rows corresponding to
+    individual samples.
+    """
+    if num_samples < 1:
+        raise ValueError("num_samples must be > 0")
+
+    _simplex = np.asarray(simplex)
+    dim = _simplex.shape[0] - 1
+    barycentric = unit_simplex(
+        dim=dim,
+        num_samples=num_samples,
+        closed=closed,
+        seed=seed,
+    )
+    return np.matmul(barycentric, _simplex)
