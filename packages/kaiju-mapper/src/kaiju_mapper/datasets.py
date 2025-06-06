@@ -170,13 +170,69 @@ def ball(
     individual samples.
     """
     if num_samples < 1:
-        raise ValueError("num_samples must be > 0")
+        raise ValueError("num_samples must be greater than 0")
 
     if dim <= 0:
         raise ValueError("dim must be at least 1")
+
+    if radius <= 0:
+        raise ValueError("radius must be greater than 0")
 
     rng = np.random.default_rng(seed)
 
     directions = sphere(dim, num_samples=num_samples, seed=rng)
     radii = radius * np.sqrt(rng.uniform(0, 1, size=num_samples))
+    return directions * radii[:, np.newaxis]
+
+
+def annulus(
+    minor_radius: float,
+    major_radius: float,
+    dim: int = 1,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    """Sample uniformly from an annulus
+
+
+    Parameters
+    ----------
+    minor_radius: float
+        The radius of the inside of the annulus
+    major_radius: float
+        The radius of the outside of the annulus
+    dim : np.ndarray
+        The dimension of the annulus to sample from.
+    num_samples : int
+        Number of points to sample.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, dim+1), with the rows corresponding to
+    individual samples.
+    """
+    if num_samples < 1:
+        raise ValueError("num_samples must be > 0")
+
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    if minor_radius <= 0:
+        raise ValueError("minor_radius must be greater than 0")
+
+    if major_radius <= 0:
+        raise ValueError("major_radius must be greater than 0")
+
+    if minor_radius >= major_radius:
+        raise ValueError("major_radius must be greater than minor_radius")
+
+    rng = np.random.default_rng(seed)
+
+    directions = sphere(dim, num_samples=num_samples, seed=rng)
+    radii = (
+        np.sqrt(rng.uniform(0, 1, size=num_samples)) * (major_radius - minor_radius)
+        + minor_radius
+    )
     return directions * radii[:, np.newaxis]
