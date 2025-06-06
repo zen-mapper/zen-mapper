@@ -362,6 +362,7 @@ name = "kaiju-mapper"
 version = "0.1.1"
 source = { editable = "packages/kaiju-mapper" }
 dependencies = [
+    { name = "numpy" },
     { name = "zen-mapper" },
 ]
 
@@ -377,7 +378,10 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "zen-mapper", editable = "packages/zen-mapper" }]
+requires-dist = [
+    { name = "numpy", specifier = ">=2.1.2" },
+    { name = "zen-mapper", editable = "packages/zen-mapper" },
+]
 
 [package.metadata.requires-dev]
 docs = [
