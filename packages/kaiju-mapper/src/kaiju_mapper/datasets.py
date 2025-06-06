@@ -188,3 +188,44 @@ def simplex(
         seed=seed,
     )
     return np.matmul(barycentric, _simplex)
+
+
+def ball(
+    dim: int,
+    radius: float = 1,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    """Sample uniformly from an n-ball
+
+
+    Parameters
+    ----------
+    dim : np.ndarray
+        The dimension of the ball to sample from.
+    radius : float
+        The radius of the ball to sample from
+    num_samples : int
+        Number of points to sample.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, dim+1), with the rows corresponding to
+    individual samples.
+    """
+    if num_samples < 1:
+        raise ValueError("num_samples must be greater than 0")
+
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    if radius <= 0:
+        raise ValueError("radius must be greater than 0")
+
+    rng = np.random.default_rng(seed)
+
+    directions = sphere(dim, num_samples=num_samples, seed=rng)
+    radii = radius * np.sqrt(rng.uniform(0, 1, size=num_samples))
+    return directions * radii[:, np.newaxis]
