@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Ethan Rooke", email = "pypi@ethan.roo.ke" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.1.2",
     "scikit-learn>=1.7.0",
