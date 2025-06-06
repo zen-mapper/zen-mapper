@@ -141,4 +141,42 @@ def sphere(
 
     result = rng.normal(size=(num_samples, dim + 1))
     result /= np.linalg.norm(result, axis=1)[:, np.newaxis]
-    return result
+    return radius * result
+
+
+def ball(
+    dim: int,
+    radius: float = 1,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    """Sample uniformly from an n-ball
+
+
+    Parameters
+    ----------
+    dim : np.ndarray
+        The dimension of the ball to sample from.
+    radius : float
+        The radius of the ball to sample from
+    num_samples : int
+        Number of points to sample.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, dim+1), with the rows corresponding to
+    individual samples.
+    """
+    if num_samples < 1:
+        raise ValueError("num_samples must be > 0")
+
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    rng = np.random.default_rng(seed)
+
+    directions = sphere(dim, num_samples=num_samples, seed=rng)
+    radii = radius * np.sqrt(rng.uniform(0, 1, size=num_samples))
+    return directions * radii[:, np.newaxis]
