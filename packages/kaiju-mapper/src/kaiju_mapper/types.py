@@ -1,6 +1,8 @@
 import numpy as np
 
-type Seed = int | np.random.SeedSequence | np.random.BitGenerator | np.random.Generator
+type Seed = (
+    int | np.random.SeedSequence | np.random.BitGenerator | np.random.Generator | None
+)
 """Seeds for random generator
 
 Technically this is overly restrictive at the moment. I could not figure out
