@@ -236,3 +236,84 @@ def annulus(
         + minor_radius
     )
     return directions * radii[:, np.newaxis]
+
+
+def flat_torus(
+    dim: int,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    result = sphere(dim=1, radius=1, num_samples=dim * num_samples, seed=seed)
+    return result.reshape(-1, 2 * dim)
+
+
+def torus(
+    minor_radius: float,
+    major_radius: float,
+    num_samples: int = 1,
+    seed: Seed = None,
+):
+    """Sample uniformly from the torus embedded in ℝ³.
+
+    Uses algorithm one from  Diaconis et al _[1].
+
+    Parameters
+    ----------
+    minor_radius: float
+        The minor radius of the torus. The width of the "tube".
+    major_radisu: float:
+        The major radius of the torus. The turning radius of the "tube".
+    num_samples : int
+        Number of points to sample.
+    seed : Seed
+        The seed for the random number generator.
+
+    Returns
+    -------
+    `np.array` of shape (num_samples, 3), with the rows corresponding to
+    individual samples.
+
+    .. [1] Persi Diaconis, Susan Holmes, and Mehrad Shahshahani, "Sampling From
+    a Manifold" 2012.
+    """
+
+    if minor_radius <= 0:
+        raise ValueError(f"Minor radius must be ≥ 0, got {minor_radius}")
+
+    if major_radius <= 0:
+        raise ValueError(f"Major radius must be ≥ 0, got {major_radius}")
+
+    if major_radius < minor_radius:
+        raise ValueError(
+            f"Major radius must be ≥ minor radius, got {major_radius=} {minor_radius=}"
+        )
+
+    if num_samples < 0:
+        raise ValueError(f"Num samples must be positive, got {num_samples=}")
+
+    rng = np.random.default_rng(seed)
+
+    phi = rng.uniform(0, 2 * np.pi, num_samples)
+    theta = np.full(num_samples, np.nan)
+    wanted_samples = num_samples
+    radius_ratio = major_radius / minor_radius
+
+    while wanted_samples != 0:
+        num_requested_samples = (
+            2 * wanted_samples
+        )  # There is a 50% chance of rejecting a sample
+        x = rng.uniform(0, 2 * np.pi, num_requested_samples)
+        y = rng.uniform(-radius_ratio, radius_ratio, num_requested_samples)
+        kept_samples = x[y < np.cos(x)][:wanted_samples]
+        index = num_samples - wanted_samples
+        theta[index : index + len(kept_samples)] = kept_samples
+        wanted_samples -= len(kept_samples)
+
+    result = np.empty((num_samples, 3))
+    result[:, 0] = (major_radius + minor_radius * np.cos(theta)) * np.cos(phi)
+    result[:, 1] = (major_radius + minor_radius * np.cos(theta)) * np.sin(phi)
+    result[:, 2] = minor_radius * np.sin(theta)
+    return result
