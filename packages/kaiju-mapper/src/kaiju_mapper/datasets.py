@@ -38,7 +38,7 @@ def unit_simplex(
     individual samples.
 
     .. [1] Noah A. Smith and Roy W. Tromble, "Sampling Uniformly from the Unit
-    Simplex," 2004.
+    Simplex" 2004.
     """
     if num_samples < 1:
         raise ValueError("num_samples must be > 0")
