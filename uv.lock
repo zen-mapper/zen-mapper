@@ -370,6 +370,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "hypothesis" },
+    { name = "matplotlib" },
     { name = "pytest" },
 ]
 docs = [
@@ -390,6 +391,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "hypothesis", specifier = ">=6.115.6" },
+    { name = "matplotlib", specifier = ">=3.9.2" },
     { name = "pytest", specifier = ">=8.3.3" },
 ]
 docs = [
