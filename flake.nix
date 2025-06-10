@@ -45,8 +45,11 @@
       LC_ALL = "en_US.UTF-8";
 
       buildInputs = [
+        (pkgs.python3.withPackages (ps: [
+          ps.uv
+          ps.tkinter
+        ]))
         pkgs.pyright
-        pkgs.uv
         pkgs.hatch
         pkgs.jq
         pkgs.just
