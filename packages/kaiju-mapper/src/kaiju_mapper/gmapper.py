@@ -176,20 +176,31 @@ class GMapperCover:
                 logger.info(f"Convergence after {iteration} iterations.")
                 break
 
-            check_interval.add(best_split)
-            check_interval.add(best_split + 1)
-
             intervals, interval_membership = _split(
                 interval_membership, intervals, self.g_overlap, best_split
             )
 
-            del ad_scores[best_split]
+            # update after split
+            check_interval.add(best_split)
+            check_interval.add(best_split + 1)
+
+            # account for shifted indices
+            new_ad_scores = {}
+            for idx, score_val in ad_scores.items():
+                if idx == best_split:
+                    continue
+                elif idx > best_split:
+                    new_ad_scores[idx + 1] = score_val
+                else:
+                    new_ad_scores[idx] = score_val
+            ad_scores = new_ad_scores
 
         return intervals
 
     def _dfs(self, lens, intervals):
         check_interval = set(range(len(intervals)))
         interval_membership = _membership(lens, intervals)
+
         for iteration in range(self.iterations):
             if len(intervals) >= self.max_intervals:
                 logger.info(
