@@ -48,3 +48,10 @@ There are templates in `docs/source/decisions` for you to use. Do not worry
 about this too much if opening a PR, if one is needed it will be mentioned
 before merging and it will probably encode whatever discussion in the issues or
 pull request led to the decision being made.
+
+### The Changelog
+
+We keep a changelog in `CHANGELOG.md` following the [keep a
+changelog](https://keepachangelog.com/en/1.0.0/) specification. When submitting
+a change add a short description of the change to the top of the changelog
+under the `[Unreleased]` section.
