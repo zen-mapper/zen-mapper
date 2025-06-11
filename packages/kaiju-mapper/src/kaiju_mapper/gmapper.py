@@ -56,8 +56,7 @@ class GMapperCover:
         Parameters
         ----------
         data : np.ndarray
-            Input data to cover. If the dataset is not 1D then it will project
-            to the first axis.
+            Input data to cover. The dataset (projection) should be 1D.
 
         Returns
         -------
@@ -65,7 +64,9 @@ class GMapperCover:
             A cover object that satisfies the Cover protocol
         """
         if len(data.shape) > 1 and data.shape[1] > 1:
-            lens = data[:, 0]
+            raise ValueError(
+                f"data of shape {len(data.shape)} is > 1. The projection should be 1D."
+            )
         else:
             lens = data
 
