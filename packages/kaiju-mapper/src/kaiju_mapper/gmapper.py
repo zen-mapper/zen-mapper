@@ -155,16 +155,31 @@ class GMapperCover:
         ad_scores: dict[int, float] = dict()
 
         for iteration in range(self.iterations):
+            if len(intervals) >= self.max_intervals:
+                logger.info(
+                    f"Reached maximum number of intervals ({self.max_intervals})."
+                )
+                break
+
             append_scores = len(ad_scores) == 0
-            for i in check_interval:
+            intervals_to_remove = []
+
+            # copy to avoid runtime error
+            intervals_to_check = list(check_interval)
+
+            for i in intervals_to_check:
                 test_result = ad_test(interval_membership[i])
 
                 if test_result <= self.ad_threshold:
-                    check_interval.remove(i)
+                    intervals_to_remove.append(i)
                     continue
 
                 if append_scores:
                     ad_scores[i] = test_result
+
+            # remove intervals AFTER iteration
+            for i in intervals_to_remove:
+                check_interval.discard(i)
 
             if not check_interval:
                 logger.info(f"Convergence after {iteration} iterations.")
@@ -209,42 +224,30 @@ class GMapperCover:
                 break
 
             to_split = None
-            for i in check_interval:
+            # copy to avoid runtime error
+            intervals_to_check = list(check_interval)
+            intervals_to_remove = []
+
+            for i in intervals_to_check:
                 if ad_test(interval_membership[i]) > self.ad_threshold:
                     to_split = i
                     break
-                check_interval.remove(i)
+                intervals_to_remove.append(i)
+
+            # remove AFTER iteration
+            for i in intervals_to_remove:
+                check_interval.discard(i)
 
             if to_split is None:
                 logger.info(f"Convergence after {iteration} iterations.")
                 break
 
-            previous_length = len(interval_membership[to_split])
-
             intervals, interval_membership = _split(
                 interval_membership, intervals, self.g_overlap, to_split
             )
 
-            left, right = to_split, to_split + 1
-            check_interval.add(right)
-
-            left_members = interval_membership[left]
-            right_members = interval_membership[right]
-
-            if previous_length == len(left_members):
-                check_interval.remove(left)
-                continue
-
-            if previous_length == len(right_members):
-                check_interval.remove(right)
-                continue
-
-            if ad_test(right_members) > ad_test(left_members):
-                intervals = np.delete(intervals, right, axis=0)
-                intervals = np.insert(intervals, left, [right_members.copy()], axis=0)
-
-                interval_membership.pop(right)
-                interval_membership.insert(left, left_members.copy())
+            check_interval.add(to_split)
+            check_interval.add(to_split + 1)
 
         return intervals
 
