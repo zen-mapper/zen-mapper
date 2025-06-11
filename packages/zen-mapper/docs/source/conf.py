@@ -42,6 +42,8 @@ intersphinx_mapping = {
 
 html_theme = "alabaster"
 html_theme_options = {
+    "logo": "logo.png",
+    "logo_name": True,
     "github_user": "zen-mapper",
     "github_repo": "zen-mapper",
 }
