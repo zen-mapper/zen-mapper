@@ -313,6 +313,9 @@ def ad_test(data):
     calling the test.
 
     """
+    # convert list to flat numpy array
+    data = np.asarray(data).flatten()
+
     n = len(data)
 
     if n < 8:
