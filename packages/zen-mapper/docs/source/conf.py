@@ -12,7 +12,7 @@ project = "Zen Mapper"
 description = "Mapper without the noise"
 copyright = "2023, Ethan Rooke"
 author = "Ethan Rooke"
-release = "0.2.0"
+release = "0.3.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,6 +42,8 @@ intersphinx_mapping = {
 
 html_theme = "alabaster"
 html_theme_options = {
+    "logo": "logo.png",
+    "logo_name": True,
     "github_user": "zen-mapper",
     "github_repo": "zen-mapper",
 }

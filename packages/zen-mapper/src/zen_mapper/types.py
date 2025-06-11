@@ -22,15 +22,17 @@ class Cover(Protocol):
     """
     Protocol for a cover
 
-    A `Cover` object must be iterable, yielding elements that are array-like
-    (e.g., NumPy arrays), and must also have a defined length.
+    A set is represented as a numpy array of indices into the original data
+    set. For instance `[0, 4, 3]` represents the set with the 0th, 4th, and 3rd
+    elements from the original dataset. A cover is a collection of these sets.
+    It is expected that these cover the dataset however no effort is made to
+    enforce this constraint.
 
-    Methods
-    -------
-    __len__()
-        Returns the number of sets in the cover.
-    __iter__()
-        Returns an iterator over the sets in the cover.
+    Specifcially we require that you can iterate over the sets in the cover and
+    that you can report the number of cover elements. In particular this means
+    a list of arrays or a set of arrays will work. It is unlikely that you will
+    actually implement this protocol, what you probably want is
+    :class:`CoverScheme`.
     """
 
     def __len__(self: Self) -> int:
@@ -64,13 +66,10 @@ class CoverScheme(Protocol):
     """
     Protocol for a cover scheme
 
-    A cover scheme is a function or callable object that takes
-    some data and produces a `Cover` object.
-
-    Methods
-    -------
-    __call__(data)
-        Generates a `Cover` from the input data.
+    A cover scheme is a function or callable object which takes the projected
+    data and produces a `Cover` object. See the example
+    :doc:`/examples/custom_cover` for a more detailed look at how to create a
+    custom covering scheme.
     """
 
     def __call__(self: Self, data: np.ndarray) -> Cover:
@@ -307,6 +306,9 @@ class Clusterer(Protocol[M]):
     the partition (an iterable of NumPy arrays, where each array holds indices)
     and the associated metadata. If there is no meaningful metadata it should
     return None.
+
+    For a more concrete example of how to specify a custom clusterer for use in
+    zen mapper see the example :doc:`/examples/custom_clusterer`.
     """
 
     def __call__(self, data: np.ndarray) -> tuple[Iterable[np.ndarray], M]: ...
