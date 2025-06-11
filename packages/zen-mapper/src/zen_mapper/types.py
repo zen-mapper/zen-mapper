@@ -306,6 +306,9 @@ class Clusterer(Protocol[M]):
     the partition (an iterable of NumPy arrays, where each array holds indices)
     and the associated metadata. If there is no meaningful metadata it should
     return None.
+
+    For a more concrete example of how to specify a custom clusterer for use in
+    zen mapper see the example :doc:`/examples/custom_clusterer`.
     """
 
     def __call__(self, data: np.ndarray) -> tuple[Iterable[np.ndarray], M]: ...
