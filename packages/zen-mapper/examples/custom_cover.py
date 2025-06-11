@@ -18,10 +18,9 @@ actual implementation of the cover itself and there may be better ways.
 import numpy as np
 
 import zen_mapper as zm
-from zen_mapper.types import Cover
 
 
-def epsilon_net(centers, epsilon, data) -> Cover:
+def epsilon_net(centers, epsilon, data) -> list[np.ndarray]:
     if len(data.shape) == 1:
         data.reshape(-1, 1)
 
@@ -37,7 +36,10 @@ def epsilon_net(centers, epsilon, data) -> Cover:
 
 
 # %%
-# We can then visualize that this cover acts as we hope it would
+# It is worth noting that :class:`list[np.ndarray]` implements the
+# :class:`Cover <zen_mapper.types.Cover>` protocol and so `epsilon_net` is
+# returning a valid `zen_mapper` cover. We can then visualize that this cover
+# acts as we hope it would
 
 import matplotlib.pyplot as plt
 
@@ -66,7 +68,7 @@ plt.show()
 # The mapper function in zen_mapper expects a `covering_scheme` which is simply
 # a function which takes data and returns a cover. I find pythons partial
 # function support to be kind of awkward. So instead of defining a function we
-# will define a class whith the `__call__` method which python will treat like
+# will define a class with the `__call__` method which python will treat like
 # a function.
 
 
@@ -75,7 +77,7 @@ class Greedy_Epsilon_Net:
         self.epsilon = epsilon
         self.centers = None
 
-    def __call__(self, data: np.ndarray) -> Cover:
+    def __call__(self, data: np.ndarray) -> list[np.ndarray]:
         to_cover = set(range(len(data)))
 
         centers = []
