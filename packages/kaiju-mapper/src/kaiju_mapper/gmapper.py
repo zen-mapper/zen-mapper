@@ -280,10 +280,21 @@ def ad_test(data):
     -------
     float
         Anderson-Darling test statistic (corrected)
+
+    Notes
+    -----
+    When ad_test returns a statistic less than alpha then
+    gmapper believes that interval is sufficiently normal and so
+    does not split. For small sample sizes we do not bother
+    calling the test.
+
     """
     n = len(data)
 
-    if n == 0:
+    if n < 8:
+        logger.warning(
+            f"Anderson-Darling: Encountered an interval with < 8 data points."
+        )
         return 0
     try:
         and_corrected = anderson(data)[0] * (1 + 4 / n - 25 / (n**2))
