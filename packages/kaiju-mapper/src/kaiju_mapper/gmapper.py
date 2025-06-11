@@ -277,9 +277,18 @@ def _membership(data, intervals):
     list
         List of lists containing data points for each interval
     """
-    return [
-        [x for x in data if interval[0] <= x <= interval[1]] for interval in intervals
-    ]
+    if hasattr(data, "__iter__"):
+        data = np.array(data).flatten()
+    else:
+        data = np.array([data])
+
+    result = []
+    for interval in intervals:
+        mask = (data >= interval[0]) & (data <= interval[1])
+        members = data[mask]
+        result.append(members.tolist())
+
+    return result
 
 
 def ad_test(data):
