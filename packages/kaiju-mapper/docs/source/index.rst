@@ -3,15 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-kaiju mapper documentation
-==========================
+Kaiju Mapper
+============
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+  SKREEEOOONNNK!
 
+  `Godzilla <https://www.youtube.com/watch?v=vnnhZ8BD0u4>`_
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
+   examples/index
