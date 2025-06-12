@@ -213,7 +213,7 @@ class GMapperCover:
         return intervals
 
     def _dfs(self, lens, intervals):
-        raise NotImplementedError
+        raise NotImplementedError("'DFS' option is not available. Try BFS instead.")
 
 
 def _split(interval_membership, intervals, g_overlap, index):
