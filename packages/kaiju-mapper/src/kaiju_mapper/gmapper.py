@@ -89,65 +89,7 @@ class GMapperCover:
         raise ValueError(f"Unknown method {self.method}")
 
     def _randomized(self, lens, intervals):
-        interval_membership = _membership(lens, intervals)
-        for iteration in range(self.iterations):
-            if len(intervals) >= self.max_intervals:
-                logger.info(
-                    f"Reached maximum number of intervals ({self.max_intervals})."
-                )
-                break
-
-            all_elements_idx = np.ones(len(intervals), dtype=bool)
-            element_ad_scores = [
-                ad_test(interval_membership[i]) for i in range(len(intervals))
-            ]
-            element_ad_scores = [
-                0 if np.isnan(x) else x for x in element_ad_scores
-            ]  # Handle NaN
-
-            if sum(element_ad_scores) == 0:
-                logger.info(
-                    f"Convergence after {iteration} iterations - all AD scores are zero."
-                )
-                break
-
-            found_valid = False
-            while not found_valid and np.any(all_elements_idx):
-                # Sample one of the intervals weighted by ad score
-                weights = np.asarray(element_ad_scores)[all_elements_idx]
-
-                if weights.sum() == 0:
-                    weights = None
-                else:
-                    weights /= weights.sum()
-
-                current_element = np.random.choice(
-                    np.asarray(np.flatnonzero(all_elements_idx), dtype=int),
-                    p=weights,
-                )
-
-                if len(interval_membership[current_element]) == 0:
-                    all_elements_idx[current_element] = False
-                    continue
-
-                if ad_test(interval_membership[current_element]) > self.ad_threshold:
-
-                    new_intervals, interval_membership = _split(
-                        interval_membership, intervals, self.g_overlap, current_element
-                    )
-                    intervals = new_intervals
-
-                    found_valid = True
-                else:
-                    all_elements_idx[current_element] = False
-
-            if not found_valid:
-                logger.info(
-                    f"Convergence after {iteration} iterations - no valid splits found."
-                )
-                break
-
-        return intervals
+        raise NotImplementedError("'randomized' option is not available. Try BFS instead.")
 
     def _bfs(self, lens, intervals):
         check_interval = set(range(len(intervals)))
