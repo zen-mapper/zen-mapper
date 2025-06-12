@@ -70,21 +70,21 @@ class GMapperCover:
         else:
             lens = data
 
-        initial_intervals = np.array([[np.min(lens), np.max(lens)]])
-        result_intervals = self._gmeans_algorithm(lens, initial_intervals)
+        initial_interval = [[np.min(lens), np.max(lens)]]
+        result_intervals = self._gmeans_algorithm(lens, initial_interval)
 
         return [
             np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
             for interval in result_intervals
         ]
 
-    def _gmeans_algorithm(self, lens, initial_intervals):
+    def _gmeans_algorithm(self, lens, initial_interval):
         if self.method == "DFS":
-            return self._dfs(lens, initial_intervals)
+            return self._dfs(lens, initial_interval)
         elif self.method == "BFS":
-            return self._bfs(lens, initial_intervals)
+            return self._bfs(lens, initial_interval)
         elif self.method == "randomized":
-            return self._randomized(lens, initial_intervals)
+            return self._randomized(lens, initial_interval)
 
         raise ValueError(f"Unknown method {self.method}")
 
