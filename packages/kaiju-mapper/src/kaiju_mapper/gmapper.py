@@ -213,43 +213,7 @@ class GMapperCover:
         return intervals
 
     def _dfs(self, lens, intervals):
-        check_interval = set(range(len(intervals)))
-        interval_membership = _membership(lens, intervals)
-
-        for iteration in range(self.iterations):
-            if len(intervals) >= self.max_intervals:
-                logger.info(
-                    f"Reached maximum number of intervals ({self.max_intervals})."
-                )
-                break
-
-            to_split = None
-            # copy to avoid runtime error
-            intervals_to_check = list(check_interval)
-            intervals_to_remove = []
-
-            for i in intervals_to_check:
-                if ad_test(interval_membership[i]) > self.ad_threshold:
-                    to_split = i
-                    break
-                intervals_to_remove.append(i)
-
-            # remove AFTER iteration
-            for i in intervals_to_remove:
-                check_interval.discard(i)
-
-            if to_split is None:
-                logger.info(f"Convergence after {iteration} iterations.")
-                break
-
-            intervals, interval_membership = _split(
-                interval_membership, intervals, self.g_overlap, to_split
-            )
-
-            check_interval.add(to_split)
-            check_interval.add(to_split + 1)
-
-        return intervals
+        raise NotImplementedError
 
 
 def _split(interval_membership, intervals, g_overlap, index):
