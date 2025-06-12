@@ -16,6 +16,7 @@ release = "0.1.1"
 
 extensions = [
     "autoapi.extension",
+    "sphinx_gallery.gen_gallery",
 ]
 
 templates_path = ["_templates"]
@@ -31,3 +32,10 @@ autoapi_ignore = ["**/test*.py"]
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+
+# -- Options for example gallery ----------------------------------------------
+sphinx_gallery_conf = {
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "examples",
+    "filename_pattern": "/*.py",
+}

@@ -370,6 +370,9 @@ docs = [
     { name = "pydata-sphinx-theme" },
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "sphinx-autoapi" },
+    { name = "sphinx-gallery" },
+    { name = "sphinxcontrib-katex" },
 ]
 
 [package.metadata]
@@ -379,6 +382,9 @@ requires-dist = [{ name = "zen-mapper", editable = "packages/zen-mapper" }]
 docs = [
     { name = "pydata-sphinx-theme", specifier = ">=0.16.1" },
     { name = "sphinx", specifier = ">=8.1.3" },
+    { name = "sphinx-autoapi", specifier = ">=3.3.3" },
+    { name = "sphinx-gallery", specifier = ">=0.18.0" },
+    { name = "sphinxcontrib-katex", specifier = ">=0.9.10" },
 ]
 
 [[package]]
