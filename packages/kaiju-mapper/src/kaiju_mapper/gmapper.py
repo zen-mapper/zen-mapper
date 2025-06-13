@@ -1,6 +1,7 @@
 import logging
-import operator
+from dataclasses import dataclass, field
 from typing import List
+import queue
 
 import numpy as np
 from scipy.stats import anderson
@@ -8,6 +9,26 @@ from sklearn.mixture import GaussianMixture
 from zen_mapper.types import Cover
 
 logger = logging.getLogger("zen_mapper")
+
+
+@dataclass(order=True)
+class QueueEntry:
+    priority: float
+    item: np.ndarray = field(compare=False)
+    members: np.ndarray = field(compare=False)
+    mask: np.ndarray = field(compare=False)
+    n: int = field(compare=False)
+
+    def __init__(self, interval, data):
+        self.item = interval
+        self.mask = (data >= self.item[0]) & (data <= self.item[1])
+        self.members = data[self.mask]
+        self.n = len(self.members)
+        if self.n > 7:
+            # the correction factor feels unnecessary
+            self.priority = -anderson(self.members)[0]
+        else:
+            self.priority = 0
 
 
 class GMapperCover:
@@ -65,18 +86,13 @@ class GMapperCover:
         """
         if len(data.shape) > 1 and data.shape[1] > 1:
             raise ValueError(
-                f"data of shape {len(data.shape)} is > 1. The projection should be 1D."
+                f"data of shape {data.shape} is > 1D. The projection should be 1D."
             )
         else:
             lens = data
 
-        initial_interval = [[np.min(lens), np.max(lens)]]
-        result_intervals = self._gmeans_algorithm(lens, initial_interval)
-
-        return [
-            np.where((lens >= interval[0]) & (lens <= interval[1]))[0]
-            for interval in result_intervals
-        ]
+        initial_interval = [np.min(lens), np.max(lens)]
+        return self._gmeans_algorithm(lens, initial_interval)
 
     def _gmeans_algorithm(self, lens, initial_interval):
         if self.method == "DFS":
@@ -89,152 +105,47 @@ class GMapperCover:
         raise ValueError(f"Unknown method {self.method}")
 
     def _randomized(self, lens, intervals):
-        raise NotImplementedError("'randomized' option is not available. Try BFS instead.")
+        raise NotImplementedError(
+            "'randomized' option is not available. Try BFS instead."
+        )
 
-    def _bfs(self, lens, intervals):
-        check_interval = set(range(len(intervals)))
-        interval_membership = _membership(lens, intervals)
-        ad_scores: dict[int, float] = dict()
+    def _bfs(self, lens, initial_interval):
+        q = queue.PriorityQueue()
+        initial_interval_entry = QueueEntry(initial_interval, lens)
+        q.put(initial_interval_entry)
 
-        for iteration in range(self.iterations):
-            if len(intervals) >= self.max_intervals:
-                logger.info(
-                    f"Reached maximum number of intervals ({self.max_intervals})."
+        cover = []
+        iteration_count = 0
+
+        while (
+            not q.empty()
+            and iteration_count < self.iterations
+            and len(cover) < self.max_intervals
+        ):
+            large_ad_element = q.get()
+
+            if large_ad_element.priority > -self.ad_threshold or large_ad_element.n < 8:
+                cover.append(np.where(np.isin(lens, large_ad_element.members))[0])
+            else:
+                split_intervals = _gm_split(
+                    large_ad_element.item, large_ad_element.members, self.g_overlap
                 )
-                break
+                new_entry_1 = QueueEntry(split_intervals[0], lens)
+                new_entry_2 = QueueEntry(split_intervals[1], lens)
+                q.put(new_entry_1)
+                q.put(new_entry_2)
 
-            append_scores = len(ad_scores) == 0
-            intervals_to_remove = []
+            iteration_count += 1
 
-            # copy to avoid runtime error
-            intervals_to_check = list(check_interval)
+        while not q.empty():
+            remaining_element = q.get()
+            print(remaining_element.members)
+            cover.append(np.where(np.isin(lens, remaining_element.members))[0])
 
-            for i in intervals_to_check:
-                test_result = ad_test(interval_membership[i])
-
-                if test_result <= self.ad_threshold:
-                    intervals_to_remove.append(i)
-                    continue
-
-                if append_scores:
-                    ad_scores[i] = test_result
-
-            # remove intervals AFTER iteration
-            for i in intervals_to_remove:
-                check_interval.discard(i)
-
-            if not check_interval:
-                logger.info(f"Convergence after {iteration} iterations.")
-                break
-
-            best_split, score = max(ad_scores.items(), key=operator.itemgetter(1))
-
-            if score == 0:
-                logger.info(f"Convergence after {iteration} iterations.")
-                break
-
-            intervals, interval_membership = _split(
-                interval_membership, intervals, self.g_overlap, best_split
-            )
-
-            # update after split
-            check_interval.add(best_split)
-            check_interval.add(best_split + 1)
-
-            # account for shifted indices
-            new_ad_scores = {}
-            for idx, score_val in ad_scores.items():
-                if idx == best_split:
-                    continue
-                elif idx > best_split:
-                    new_ad_scores[idx + 1] = score_val
-                else:
-                    new_ad_scores[idx] = score_val
-            ad_scores = new_ad_scores
-
-        return intervals
+        return cover
 
     def _dfs(self, lens, intervals):
         raise NotImplementedError("'DFS' option is not available. Try BFS instead.")
-
-
-def _split(interval_membership, intervals, g_overlap, index):
-    split_interval = _gm_split(
-        intervals[index], np.array(interval_membership[index]), g_overlap
-    )
-
-    new_intervals = np.delete(intervals, index, axis=0)
-    new_intervals = np.insert(new_intervals, index, split_interval, axis=0)
-
-    new_membership = _membership(interval_membership[index], split_interval)
-    interval_membership.pop(index)
-    interval_membership.insert(index, new_membership[0])
-    interval_membership.insert(index + 1, new_membership[1])
-
-    return new_intervals, interval_membership
-
-
-def _membership(data, intervals):
-    """
-    Assign data points to intervals.
-
-    Returns
-    -------
-    list
-        List of lists containing data points for each interval
-    """
-    if hasattr(data, "__iter__"):
-        data = np.array(data).flatten()
-    else:
-        data = np.array([data])
-
-    result = []
-    for interval in intervals:
-        mask = (data >= interval[0]) & (data <= interval[1])
-        members = data[mask]
-        result.append(members.tolist())
-
-    return result
-
-
-def ad_test(data):
-    """
-    Anderson-Darling Test for normality.
-
-    Parameters
-    ----------
-    data : list or np.ndarray
-        Data points to test for normality
-
-    Returns
-    -------
-    float
-        Anderson-Darling test statistic (corrected)
-
-    Notes
-    -----
-    When ad_test returns a statistic less than alpha then
-    gmapper believes that interval is sufficiently normal and so
-    does not split. For small sample sizes we do not bother
-    calling the test.
-
-    """
-    # convert list to flat numpy array
-    data = np.asarray(data).flatten()
-
-    n = len(data)
-
-    if n < 8:
-        logger.warning(
-            f"Anderson-Darling: Encountered an interval with < 8 data points."
-        )
-        return 0
-    try:
-        and_corrected = anderson(data)[0] * (1 + 4 / n - 25 / (n**2))
-        return and_corrected
-    except Exception as e:
-        logger.warning(f"Anderson-Darling test failed: {e}")
-        return 0
 
 
 def _gm_split(interval, membership_data, g_overlap):
