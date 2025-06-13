@@ -42,7 +42,7 @@ class GMapperCover:
     max_intervals : int
         Maximum number of intervals to create
     method : str
-        Method to use for splitting intervals ('DFS', 'BFS', or 'randomized')
+        Method to use for splitting intervals ('greedy', DFS', 'BFS', or 'randomized')
     ad_threshold : float
         Threshold for Anderson-Darling test to determine when to split
     g_overlap : float
@@ -60,7 +60,7 @@ class GMapperCover:
         self,
         iterations=20,
         max_intervals=25,
-        method="BFS",
+        method="greedy",
         ad_threshold=5,
         g_overlap=0.3,
     ):
@@ -97,19 +97,26 @@ class GMapperCover:
     def _gmeans_algorithm(self, lens, initial_interval):
         if self.method == "DFS":
             return self._dfs(lens, initial_interval)
-        elif self.method == "BFS":
-            return self._bfs(lens, initial_interval)
+        elif self.method == "greedy":
+            return self._greedy(lens, initial_interval)
         elif self.method == "randomized":
             return self._randomized(lens, initial_interval)
+        elif self.method == "BFS":
+            return self._bfs(lens, initial_interval)
 
         raise ValueError(f"Unknown method {self.method}")
 
     def _randomized(self, lens, intervals):
         raise NotImplementedError(
-            "'randomized' option is not available. Try BFS instead."
+            "'randomized' option is not available. Try 'greedy' instead."
         )
 
-    def _bfs(self, lens, initial_interval):
+    def _bfs(self, lens, intervals):
+        raise NotImplementedError(
+            "'BFS' option is not available. Try 'greedy' instead."
+        )
+
+    def _greedy(self, lens, initial_interval):
         q = queue.PriorityQueue()
         initial_interval_entry = QueueEntry(initial_interval, lens)
         q.put(initial_interval_entry)
@@ -145,7 +152,9 @@ class GMapperCover:
         return cover
 
     def _dfs(self, lens, intervals):
-        raise NotImplementedError("'DFS' option is not available. Try BFS instead.")
+        raise NotImplementedError(
+            "'DFS' option is not available. Try 'greedy' instead."
+        )
 
 
 def _gm_split(interval, membership_data, g_overlap):
