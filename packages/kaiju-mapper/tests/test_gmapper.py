@@ -1,6 +1,7 @@
 from itertools import chain
 
 import numpy as np
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
@@ -33,6 +34,10 @@ def cover_scheme(draw):
     )
 
 
+# The sklearn GaussianMixture fitting procedure generates a lot of warnings on
+# degenerate input, this is expected and we don't really want to hear about it
+# in our test suite.
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @given(
     cover_scheme(),
     arrays(
@@ -46,6 +51,10 @@ def test_max_intervals(cover_scheme: GMapperCoverScheme, data: np.ndarray):
     assert len(cover) <= cover_scheme.max_intervals
 
 
+# The sklearn GaussianMixture fitting procedure generates a lot of warnings on
+# degenerate input, this is expected and we don't really want to hear about it
+# in our test suite.
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @given(
     cover_scheme(),
     arrays(
