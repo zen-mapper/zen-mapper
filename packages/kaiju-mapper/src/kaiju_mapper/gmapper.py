@@ -5,6 +5,8 @@ import numpy as np
 from scipy.stats import anderson
 from sklearn.mixture import GaussianMixture
 
+__all__ = ("GMapperCoverScheme", "Interval")
+
 
 @dataclass(order=True, slots=True)
 class Interval:
