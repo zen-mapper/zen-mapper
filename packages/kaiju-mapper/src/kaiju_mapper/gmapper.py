@@ -1,8 +1,10 @@
 import heapq
+import warnings
 from dataclasses import dataclass, field
 
 import numpy as np
 from scipy.stats import anderson
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import GaussianMixture
 
 __all__ = ("GMapperCoverScheme", "Interval")
@@ -74,24 +76,30 @@ def split(interval: Interval, data: np.ndarray, g_overlap: float) -> list[Interv
     m = np.sqrt(2 / np.pi) * std
     c1, c2 = mean + m, mean - m
 
-    try:
-        gmm = GaussianMixture(
-            n_components=2,
-            means_init=[[c1], [c2]],
-            covariance_type="full",
-        ).fit(masked_data.reshape(-1, 1))
-    except ValueError:
-        # sometimes this method ends up crashing due to intermediate infs and
-        # nans. I am not sure what about the input causes this to happen so I
-        # don't know how to guard against it
-        return []
+    gmm = GaussianMixture(
+        n_components=2,
+        means_init=[[c1], [c2]],
+        covariance_type="full",
+    )
 
-    if gmm.n_features_in_ == 1:  # type: ignore
-        # Gaussian Mixture is convinced there is one cluster, we wont split here
-        return []
+    with warnings.catch_warnings():
+        # This warning is raised when the gmm fails to find two clusters
+        # we would like to handle this case so we convert the warning to an
+        # exception
+        warnings.simplefilter("error", category=ConvergenceWarning)
+        try:
+            gmm_result = gmm.fit(masked_data.reshape(-1, 1))
+        except ValueError:
+            # sometimes this method ends up crashing due to intermediate infs and
+            # nans. I am not sure what about the input causes this to happen so I
+            # don't know how to guard against it
+            return []
+        except ConvergenceWarning:
+            # gmm only found one cluster, refuse to split
+            return []
 
-    means: np.ndarray = gmm.means_.flatten()  # type: ignore
-    covariances: np.ndarray = gmm.covariances_.flatten()  # type: ignore
+    means: np.ndarray = gmm_result.means_.flatten()  # type: ignore
+    covariances: np.ndarray = gmm_result.covariances_.flatten()  # type: ignore
 
     index = np.argsort(means)
     means = means[index]
