@@ -27,4 +27,8 @@ docs = [
     "sphinx-autoapi>=3.3.3",
     "sphinx-gallery>=0.18.0",
     "sphinxcontrib-katex>=0.9.10",
-	]
+]
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+testpaths = [ "tests", "src" ]
