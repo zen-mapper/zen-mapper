@@ -1,4 +1,5 @@
 import heapq
+import logging
 import warnings
 from dataclasses import dataclass, field
 
@@ -8,6 +9,9 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import GaussianMixture
 
 __all__ = ("GMapperCoverScheme", "Interval")
+
+
+_logger = logging.getLogger("kaiju_mapper")
 
 
 @dataclass(order=True, slots=True)
@@ -117,7 +121,6 @@ def split(
         left_std + right_std
     ) * (right_mean - left_mean)
 
-
     if new_upper_bound >= interval.upper_bound:
         return None
 
@@ -170,15 +173,15 @@ def bfs(
     iteration = 0
     while True:
         if len(cover) >= max_intervals:
-            print("max_intervals hit")
+            _logger.info("max_intervals hit")
             break
 
         if iteration > iterations:
-            print("max iteration hit")
+            _logger.info("max iteration hit")
             break
 
         if -cover[0].ad_score < ad_threshold:
-            print("largest ad_score is below threshold")
+            _logger.info("largest ad_score is below threshold")
             break
 
         iteration += 1
