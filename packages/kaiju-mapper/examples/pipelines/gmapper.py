@@ -1,37 +1,27 @@
 """
 G-Mapper
-------
-"""
+--------
 
-# %%
-# Data
-# ====
-# We will start by generating a two circle data set like that from Figure 6 of
-# the paper.
+Data
+====
+We will start by generating a two circle data set like that from Figure 6 of
+the paper.
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from kaiju_mapper.datasets import sphere
 
-NUM_SAMPLES = 5000
 rng = np.random.default_rng(seed=0xDEADBEEF)
-data = np.full((NUM_SAMPLES, 2), fill_value=np.nan, dtype=float)
 
-# Sample half of our points from a big circle
-data[: NUM_SAMPLES // 2, :] = sphere(
+data = sphere(
     dim=1,
-    radius=1,
-    num_samples=NUM_SAMPLES // 2,
+    radius=[0.4, 1],
+    num_samples=10_000,
     seed=rng,
 )
-# Sample half of our points from a small circle
-data[NUM_SAMPLES // 2 :, :] = sphere(
-    dim=1,
-    radius=0.3,
-    num_samples=NUM_SAMPLES // 2,
-    seed=rng,
-)
+
 # Add some noise to our samples
 data += rng.normal(0, 0.03, data.shape)
 
@@ -64,22 +54,23 @@ plt.gca().axis("equal")
 plt.show()
 
 # %%
-# Lets doit
-# =========
-from sklearn.cluster import DBSCAN
+# Computing the mapper graph
+# ==========================
 import networkx as nx
+from sklearn.cluster import DBSCAN
 
 from kaiju_mapper import GMapperCoverScheme, mapper
 from kaiju_mapper.adapters import sk_learn, to_networkx
 
-clusterer = sk_learn(DBSCAN(eps=0.1, min_samples=5))
-
 cover = GMapperCoverScheme(
     ad_threshold=10,
     g_overlap=0.1,
-    max_intervals=8,
+    max_intervals=5,
     iterations=100,
+    seed=rng,
 )
+
+clusterer = sk_learn(DBSCAN(eps=0.1, min_samples=5))
 
 result = mapper(
     data=data,
@@ -89,15 +80,26 @@ result = mapper(
     dim=1,
 )
 
-for interval in cover.intervals:
-    plt.scatter(data[interval.members,0], data[interval.members, 1])
-
-plt.show()
-
-
-# %%
-# And now, a graph
-# ================
+# Convert to a networkx graph for visualization
 graph = to_networkx(result.nerve)
-nx.draw(graph)
+
+# Compute the average projection value for each node
+nodes = (result.nodes[node] for node in graph.nodes)
+colors = [np.mean(projection[node]) for node in nodes]
+
+# Compute the layout of the graph
+kk = nx.kamada_kawai_layout(graph)
+
+# Center each connected component, not necessary but makes the image look nicer
+for component in nx.connected_components(graph):
+    mean = np.zeros(2)
+    for node in component:
+        mean += kk[node]
+    mean /= len(component)
+    for node in component:
+        kk[node] -= mean
+
+# Draw the graph, using the average projection value as our color value
+nx.draw(graph, node_color=colors, node_size=1_150, pos=kk)
 plt.show()
+# sphinx_gallery_thumbnail_number = -1
