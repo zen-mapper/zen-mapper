@@ -32,6 +32,8 @@ autoapi_ignore = ["**/test*.py"]
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+html_logo = "_static/logo.svg"
+html_css_files = ["css/custom.css"]
 
 # -- Options for example gallery ----------------------------------------------
 sphinx_gallery_conf = {
