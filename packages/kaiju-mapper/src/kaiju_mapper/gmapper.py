@@ -69,7 +69,11 @@ def ad_test(data: np.ndarray) -> float:
     return result.statistic * (1 + (4 / n) - (5 / n) ** 2)  # type: ignore
 
 
-def split(interval: Interval, data: np.ndarray, g_overlap: float) -> list[Interval]:
+def split(
+    interval: Interval,
+    data: np.ndarray,
+    g_overlap: float,
+) -> tuple[Interval, Interval] | None:
     masked_data = data[interval.members]
     mean = np.mean(masked_data)
     std = np.std(masked_data, ddof=1)
@@ -93,10 +97,10 @@ def split(interval: Interval, data: np.ndarray, g_overlap: float) -> list[Interv
             # sometimes this method ends up crashing due to intermediate infs and
             # nans. I am not sure what about the input causes this to happen so I
             # don't know how to guard against it
-            return []
+            return None
         except ConvergenceWarning:
             # gmm only found one cluster, refuse to split
-            return []
+            return None
 
     means: np.ndarray = gmm_result.means_.flatten()  # type: ignore
     covariances: np.ndarray = gmm_result.covariances_.flatten()  # type: ignore
@@ -113,23 +117,24 @@ def split(interval: Interval, data: np.ndarray, g_overlap: float) -> list[Interv
         left_std + right_std
     ) * (right_mean - left_mean)
 
-    result = []
 
-    if new_upper_bound < interval.upper_bound:
-        result.append(
-            make_interval(
-                data, interval.lower_bound, new_upper_bound, mask=interval.members
-            )
-        )
+    if new_upper_bound >= interval.upper_bound:
+        return None
 
-    if new_lower_bound > interval.lower_bound:
-        result.append(
-            make_interval(
-                data, new_lower_bound, interval.upper_bound, mask=interval.members
-            )
-        )
+    if new_lower_bound <= interval.lower_bound:
+        return None
 
-    return result
+    return make_interval(
+        data,
+        interval.lower_bound,
+        new_upper_bound,
+        mask=interval.members,
+    ), make_interval(
+        data,
+        new_lower_bound,
+        interval.upper_bound,
+        mask=interval.members,
+    )
 
 
 def make_interval(
@@ -181,12 +186,13 @@ def bfs(
 
         new_intervals = split(interval, lens, g_overlap)
 
-        if len(new_intervals) == 0:
+        if new_intervals is None:
             # splitting the interval resulted in no new intervals, to stop us
             # checking again we put it back on the heap with an impossibly
             # small ad_score
             interval.ad_score = np.inf
             heapq.heappush(cover, interval)
+            continue
 
         for interval in new_intervals:
             heapq.heappush(cover, interval)
