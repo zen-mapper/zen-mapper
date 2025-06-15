@@ -102,7 +102,6 @@ def split(interval: Interval, data: np.ndarray, g_overlap: float) -> list[Interv
     covariances: np.ndarray = gmm_result.covariances_.flatten()  # type: ignore
 
     index = np.argsort(means)
-    means = means[index]
     left_mean, right_mean = means[index]
     left_std, right_std = np.sqrt(covariances[index])
 
