@@ -17,6 +17,7 @@ release = "0.1.1"
 extensions = [
     "autoapi.extension",
     "sphinx_gallery.gen_gallery",
+    "sphinx_design",
 ]
 
 templates_path = ["_templates"]
