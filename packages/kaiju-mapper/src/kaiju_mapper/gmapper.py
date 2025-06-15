@@ -8,6 +8,8 @@ from scipy.stats import anderson
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import GaussianMixture
 
+from kaiju_mapper.types import Seed
+
 __all__ = ("GMapperCoverScheme", "Interval")
 
 
@@ -28,22 +30,35 @@ class GMapperCoverScheme:
     max_intervals: int
     ad_threshold: float
     g_overlap: float
-    intervals: list[Interval] = field(default_factory=list, init=False)
+    intervals: list[Interval]
+    rng: np.random.Generator
 
-    def __post_init__(self):
-        if self.iterations < 1:
-            raise ValueError(f"iterations must be > 0, got {self.iterations}")
+    def __init__(
+        self,
+        iterations: int,
+        max_intervals: int,
+        ad_threshold: float,
+        g_overlap: float,
+        seed: Seed | None = None,
+    ):
+        if iterations < 1:
+            raise ValueError(f"iterations must be > 0, got {iterations}")
 
-        if self.max_intervals < 1:
-            raise ValueError(f"max_intervals must be > 0, got {self.max_intervals}")
+        if max_intervals < 1:
+            raise ValueError(f"max_intervals must be > 0, got {max_intervals}")
 
-        if self.ad_threshold <= 0:
-            raise ValueError(f"ad_threshold must be > 0, got {self.ad_threshold}")
+        if ad_threshold <= 0:
+            raise ValueError(f"ad_threshold must be > 0, got {ad_threshold}")
 
-        if self.g_overlap <= 0 or self.g_overlap >= 1:
-            raise ValueError(
-                f"g_overlap must be in the range (0,1), got {self.g_overlap}"
-            )
+        if g_overlap <= 0 or g_overlap >= 1:
+            raise ValueError(f"g_overlap must be in the range (0,1), got {g_overlap}")
+
+        self.iterations = iterations
+        self.max_intervals = max_intervals
+        self.ad_threshold = ad_threshold
+        self.g_overlap = g_overlap
+        self.rng = np.random.default_rng(seed)
+        self.intervals = list()
 
     def __call__(self, data: np.ndarray):
         if data.squeeze().ndim > 1:
@@ -56,6 +71,8 @@ class GMapperCoverScheme:
             max_intervals=self.max_intervals,
             ad_threshold=self.ad_threshold,
             g_overlap=self.g_overlap,
+            random_state=int(self.rng.integers(0, 4294967295, endpoint=True)),
+            # sklearn does not accept the new numpy generators, only ints
         )
 
         return [interval.members for interval in self.intervals]
@@ -77,6 +94,7 @@ def split(
     interval: Interval,
     data: np.ndarray,
     g_overlap: float,
+    random_state: int,
 ) -> tuple[Interval, Interval] | None:
     masked_data = data[interval.members]
     mean = np.mean(masked_data)
@@ -88,6 +106,7 @@ def split(
         n_components=2,
         means_init=[[c1], [c2]],
         covariance_type="full",
+        random_state=random_state,
     )
 
     with warnings.catch_warnings():
@@ -167,6 +186,7 @@ def bfs(
     max_intervals: int,
     ad_threshold: float,
     g_overlap: float,
+    random_state: int,
 ) -> list[Interval]:
     cover: list[Interval] = []
     heapq.heappush(cover, make_interval(lens, np.min(lens), np.max(lens)))
@@ -187,7 +207,7 @@ def bfs(
         iteration += 1
         interval = heapq.heappop(cover)
 
-        new_intervals = split(interval, lens, g_overlap)
+        new_intervals = split(interval, lens, g_overlap, random_state=random_state)
 
         if new_intervals is None:
             # splitting the interval resulted in no new intervals, to stop us
