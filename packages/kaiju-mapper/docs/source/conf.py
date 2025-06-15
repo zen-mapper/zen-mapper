@@ -27,6 +27,7 @@ exclude_patterns = []
 # -- Options for Api documentation --------------------------------------------
 autoapi_dirs = ["../../src/kaiju_mapper/"]
 autoapi_ignore = ["**/test*.py"]
+autoapi_root = 'api'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
