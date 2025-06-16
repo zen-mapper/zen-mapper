@@ -1,3 +1,8 @@
 html {
 	--pst-header-height: 8rem;
 }
+
+/* As far as I can tell this is the only way to remove this */
+.sphx-glr-download-link-note {
+	display: none;
+}
