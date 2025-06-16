@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.1.2",
+    "scikit-learn>=1.7.0",
     "zen-mapper>=0.2.0",
 ]
 
