@@ -42,4 +42,6 @@ sphinx_gallery_conf = {
     "examples_dirs": ["../../examples/datasets/", "../../examples/pipelines/"],
     "gallery_dirs": ["dataset-examples", "pipeline-examples"],
     "filename_pattern": "/*.py",
+    "remove_config_comments": True,
+    "download_all_examples": False,
 }
