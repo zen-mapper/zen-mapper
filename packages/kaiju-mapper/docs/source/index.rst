@@ -11,6 +11,8 @@ Kaiju Mapper
   `Godzilla <https://www.youtube.com/watch?v=vnnhZ8BD0u4>`_
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   examples/index
+   API <api/index>
+   pipeline-examples/index
+   dataset-examples/index
