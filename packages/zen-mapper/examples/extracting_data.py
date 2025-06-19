@@ -63,6 +63,7 @@ cluster_stds = []
 
 # Get data from nodes!
 for data_indices in result.nodes:
+    # This is where we extract data
     cluster_points = data[data_indices]
     center = np.mean(cluster_points, axis=0)
     std = np.std(cluster_points)
