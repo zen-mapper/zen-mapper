@@ -1,0 +1,4 @@
+.. _pipeline-examples:
+
+Pipelines
+---------
