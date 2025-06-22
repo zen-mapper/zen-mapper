@@ -20,3 +20,12 @@ data = sphere(dim=1, radius=1.5, num_samples=250, seed=0xDEADBEEF)
 plt.scatter(data[:, 0], data[:, 1])
 plt.gca().axis("equal")
 plt.show()
+
+# %%
+# Nested Spheres
+# ==============
+# You can sample from multiple spheres by specify multiple radii.
+data = sphere(dim=1, radius=[2, 4], num_samples=250, seed=0xDEADBEEF)
+plt.scatter(data[:, 0], data[:, 1])
+plt.gca().axis("equal")
+plt.show()
