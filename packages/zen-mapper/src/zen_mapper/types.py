@@ -333,7 +333,7 @@ class Clusterer(Protocol[H, M]):
         self,
         data: H,
         elements: np.ndarray,
-    ) -> tuple[Collection[np.ndarray], M]:
+    ) -> tuple[Collection[npt.ArrayLike], M]:
         """Partition a subset of the dataset into disjoint groups.
 
         Parameters
@@ -346,9 +346,10 @@ class Clusterer(Protocol[H, M]):
 
         Returns
         -------
-        partition : Collection[np.ndarray]
-            A Collection of NumPy arrays. Each array contains indices into
-            `elements`. The collection must form a partition of `elements`.
+        partition : Collection[npt.ArrayLike]
+            A Collection of NumPy array-like things. Each array contains
+            indices into `elements`. The collection must form a partition of
+            `elements`.
         metadata : M
             Associated metadata produced by the clustering process. Returns
             None if no meaningful metadata is generated.

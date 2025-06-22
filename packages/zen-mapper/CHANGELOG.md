@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The clusterer protocol requires passing in the global dataset along with the
   indices to cluster now.
 - The sk_learn adapter now accepts `ArrayLike` objects, not just `ndarray`s
+- The clusterer protocol now allows returning `ArrayLike` objects, not just `ndarray`s
 
 ### Fixed
 

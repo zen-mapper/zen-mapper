@@ -71,7 +71,7 @@ def mapper(
         m = len(nodes)
         n = len(clusters)
         cover_id.append(list(range(m, m + n)))
-        nodes.extend(element[cluster] for cluster in clusters)
+        nodes.extend(element[np.asarray(cluster)] for cluster in clusters)
 
     return MapperResult(
         nodes=nodes,
