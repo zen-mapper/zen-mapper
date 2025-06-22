@@ -282,3 +282,15 @@ def annulus(
         + minor_radius
     )
     return directions * radii[:, np.newaxis]
+
+
+def flat_torus(
+    dim: int,
+    num_samples: int = 1,
+    seed: Seed = None,
+) -> np.ndarray:
+    if dim <= 0:
+        raise ValueError("dim must be at least 1")
+
+    result = sphere(dim=1, radius=1, num_samples=dim * num_samples, seed=seed)
+    return result.reshape(-1, 2 * dim)
