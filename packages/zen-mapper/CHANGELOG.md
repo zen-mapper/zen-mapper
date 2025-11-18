@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- There is now a `Data_Balanced_Cover` which covers a one-dimensional data set
+  with even bins.
+
 ### Change
 
 - The clusterer protocol requires passing in the global dataset along with the

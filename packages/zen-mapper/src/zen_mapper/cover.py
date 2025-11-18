@@ -5,7 +5,12 @@ import numpy.typing as npt
 
 from .types import Cover, CoverScheme
 
-__all__ = ["precomputed_cover", "rectangular_cover", "Width_Balanced_Cover"]
+__all__ = [
+    "precomputed_cover",
+    "rectangular_cover",
+    "Width_Balanced_Cover",
+    "Data_Balanced_Cover",
+]
 
 logger = logging.getLogger("zen_mapper")
 
@@ -131,3 +136,107 @@ class Width_Balanced_Cover:
         centers = _grid(lower_bound, upper_bound, self.n_elements)
         self.centers = centers
         return rectangular_cover(centers, width, data)
+
+
+class Data_Balanced_Cover:
+    r"""
+    A cover of 1D data with roughly equal data points per interval.
+
+    The cover is constructed by partitioning the sorted indices :math:`[0, \dots, N-1]`
+    into intervals of approximately equal size, then mapping those
+    index-regions back to the original data positions.
+
+    Each bin has a base size and step calculated as:
+
+    .. math::
+        base\_size = \frac{N}{k - (k - 1) \times \text{overlap}}
+
+    .. math::
+        step = base\_size \times (1 - \text{overlap})
+
+    where :math:`k` is `n_elements`.
+
+    Parameters
+    ----------
+    n_elements : int
+        The number of intervals (cover elements) to create. Must be $\ge 1$.
+    percent_overlap : float
+        The fractional overlap between adjacent intervals, $0 < \text{overlap} < 1$.
+
+    Attributes
+    ----------
+    n_elements : int
+        The number of cover elements.
+    percent_overlap : float
+        The fractional overlap.
+
+    Raises
+    ------
+    ValueError
+        If `n_elements` < 1 or `percent_overlap` is not in the range (0, 1).
+
+    Notes
+    -----
+    A `percent_overlap` of 0.5 means each interval shares approximately 50%
+    of its points with the subsequent interval.
+    """
+
+    def __init__(self, n_elements: int, percent_overlap: float):
+        self._cover = Width_Balanced_Cover(
+            n_elements=n_elements,
+            percent_overlap=percent_overlap,
+        )
+        self.n_elements = n_elements
+        self.percent_overlap = percent_overlap
+
+    def __call__(self, data: npt.ArrayLike):
+        """
+        Partition the input data into overlapping intervals containing
+        approximately equal numbers of points.
+
+        This method sorts the input data and applies a width-balanced cover
+        to the indices. It then maps these index-based regions back to the
+        original data indices to create the balanced cover.
+
+        Parameters
+        ----------
+        data : array_like
+            A 1-dimensional array of data points to be partitioned.
+
+        Returns
+        -------
+        list of ndarray
+            A list containing the indices of the original data points
+            belonging to each cover element. Each element in the list is
+            an `np.ndarray`.
+
+        Raises
+        ------
+        ValueError
+            If the input `data` is not 1-dimensional.
+        ValueError
+            If the number of points in `data` is less than the requested
+            `n_elements`.
+        """
+        data = np.asarray(data, dtype=float)
+
+        if data.ndim != 1:
+            raise ValueError(
+                f"Data_Balanced_Cover only supports 1-dimensional input"
+                f"(projected) data but received data with dim: {data.ndim}"
+            )
+
+        logger.info("Computing the data balanced cover")
+
+        n = len(data)
+
+        if n < self.n_elements:
+            raise ValueError("Number of data points must be >= n_elements")
+
+        sort_idx = np.argsort(data)
+        idxs = np.arange(n)
+        cover_idxs = self._cover(idxs)
+
+        cover = [sort_idx[g] for g in cover_idxs]
+
+        return cover
