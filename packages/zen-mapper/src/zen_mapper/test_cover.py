@@ -1,11 +1,17 @@
 from functools import reduce
 
 import numpy as np
+import pytest
 from hypothesis import given
 from hypothesis.extra import numpy
 from hypothesis.strategies import fixed_dictionaries, floats, integers, just
 
-from zen_mapper.cover import Width_Balanced_Cover, _grid, rectangular_cover
+from zen_mapper.cover import (
+    Data_Balanced_Cover,
+    Width_Balanced_Cover,
+    _grid,
+    rectangular_cover,
+)
 
 
 def test_1d_rectangle():
@@ -126,3 +132,84 @@ def test_width_balanced_int():
     cover_scheme = Width_Balanced_Cover(3, 0.4)
     covered_data = reduce(lambda acc, new: acc.union(new), cover_scheme(data), set())
     assert len(data) == len(covered_data)
+
+
+def test_data_balanced_simple():
+    """
+    Test that Data_Balanced_Cover partitions data as expected for a tiny array.
+    """
+    cover = Data_Balanced_Cover(2, 0.5)
+    data = np.array([10, 20, 30, 40, 50, 60])
+    expected = {
+        frozenset({0, 1, 2, 3}),
+        frozenset({2, 3, 4, 5}),
+    }
+
+    groups = set(map(frozenset, cover(data)))
+    assert expected == groups
+
+
+def test_data_balanced_complete_coverage_random():
+    """Ensure that for arbitrary random data all indices are covered."""
+    rng = np.random.default_rng(42)
+    data = rng.normal(size=200)
+    n_elements = 5
+    overlap = 0.3
+
+    cover = Data_Balanced_Cover(n_elements, overlap)
+    groups = cover(data)
+
+    all_indices = set(np.concatenate(groups))
+    assert all_indices == set(range(len(data)))
+
+
+def test_data_balanced_small_dataset_error():
+    """Should raise ValueError if data has fewer points than groups."""
+    data = np.arange(3)
+    with pytest.raises(ValueError):
+        Data_Balanced_Cover(5, 0.4)(data)
+
+
+@pytest.mark.parametrize("overlap", [0, 1, -0.1, 2.0])
+def test_data_balanced_invalid_overlap(overlap):
+    """Should reject invalid percent_overlap."""
+    with pytest.raises(ValueError):
+        Data_Balanced_Cover(3, overlap)
+
+
+def test_data_balanced_invalid_n_elements():
+    """Should reject n_elements < 1."""
+    with pytest.raises(ValueError):
+        Data_Balanced_Cover(0, 0.4)
+
+
+def test_data_balanced_only_1d_allowed():
+    """Multi-dimensional data should be rejected."""
+    data = np.random.rand(10, 2)
+    with pytest.raises(ValueError):
+        Data_Balanced_Cover(3, 0.4)(data)
+
+
+def test_data_balanced_cover_structure():
+    """Check approximate interval structure and order consistency."""
+    data = np.linspace(0, 100, 101)
+    n_elements = 4
+    overlap = 0.25
+    cover = Data_Balanced_Cover(n_elements, overlap)
+    groups = cover(data)
+
+    # No repeat elements in any cover element
+    for g in groups:
+        assert np.unique_values(g).size == g.size
+
+    # Pairwise overlap is consistent
+    for g1, g2 in zip(groups, groups[1:]):
+        assert np.intersect1d(g1, g2).size == 7
+
+    all_idx = np.concatenate(groups)
+
+    # Every id is present in the original data
+    assert np.all(all_idx < len(data))
+
+    # Every index is present
+    assert set(all_idx) == set(range(len(data)))
