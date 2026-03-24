@@ -65,7 +65,7 @@ def get_clusters(
 
 def epsilon_density_clusterer(
     epsilon: float, num_clusters: int, data: np.ndarray
-) -> Iterator[np.ndarray]:
+) -> list[np.ndarray]:
     """
     Performs density-based clustering using an epsilon neighborhood.
 
@@ -83,12 +83,12 @@ def epsilon_density_clusterer(
     density_counts = neighbor_counts(epsilon=epsilon, data=data)
 
     # generate and return clusters based on the density counts
-    return get_clusters(num_clusters=num_clusters, neighbor_counts=density_counts)
+    return list(get_clusters(num_clusters=num_clusters, neighbor_counts=density_counts))
 
 
 # make our clusterer passable to zen-mapper:
-def clusterer(data):
-    return epsilon_density_clusterer(epsilon, num_clusters, data), None
+def clusterer(data, elements) -> tuple[list[np.ndarray], None]:
+    return epsilon_density_clusterer(epsilon, num_clusters, data[elements]), None
 
 
 # clustering parameters
