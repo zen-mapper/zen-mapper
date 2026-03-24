@@ -64,7 +64,7 @@ def mapper(
         logger.info("Clustering cover element %d", i)
         clusters, meta = clusterer(data[element])
         metadata.append(meta)
-        new_nodes = [element[cluster] for cluster in clusters]
+        new_nodes = [element[cluster] for cluster in clusters if len(cluster)]
         logger.info("Found %d clusters", len(new_nodes))
         if new_nodes:
             m = len(nodes)
