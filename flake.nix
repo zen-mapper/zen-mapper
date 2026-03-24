@@ -13,7 +13,7 @@
     overlay = import ./nix/overlay.nix;
     pkgs = import nixpkgs {
       inherit system;
-      overlays = [ overlay ];
+      overlays = [overlay];
     };
   in {
     formatter.${system} = pkgs.alejandra;
@@ -32,11 +32,17 @@
     };
 
     checks.${system} = builtins.listToAttrs (
-      map
-      (python: {
-        name = python;
-        value = pkgs."${python}".pkgs.callPackage ./nix/zen-mapper.nix {};
-      })
+      pkgs.lib.concatMap
+      (python: [
+        {
+          name = "zen-${python}";
+          value = pkgs."${python}".pkgs.zen-mapper;
+        }
+        {
+          name = "kaiju-${python}";
+          value = pkgs."${python}".pkgs.kaiju-mapper;
+        }
+      ])
       [
         "python314"
         "python313"
