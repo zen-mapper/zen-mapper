@@ -8,7 +8,7 @@ alias fmt := format
 format:
 	ruff format .
 	ruff check src --fix
-	nix fmt
+	find . -type f -name "*.nix" -exec nix fmt {} +
 
 # Check for issues
 lint: type-check
