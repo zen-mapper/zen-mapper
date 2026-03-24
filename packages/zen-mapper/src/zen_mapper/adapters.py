@@ -1,7 +1,7 @@
 """Adapters for converting between zen-mapper types and 3rd party types"""
 
 import logging
-from collections.abc import Iterable
+from collections.abc import Collection
 from typing import TypeVar
 
 import numpy as np
@@ -56,7 +56,7 @@ def to_networkx(komplex: Komplex):
 C = TypeVar("C")
 
 
-def sk_learn(base_clusterer: C) -> Clusterer[C]:
+def sk_learn(base_clusterer: C) -> Clusterer[np.ndarray, C]:
     """Wraps a scikit-learn clusterer for use with zen-mapper.
 
     This function acts as an adapter, allowing scikit-learn's clustering
@@ -89,12 +89,15 @@ def sk_learn(base_clusterer: C) -> Clusterer[C]:
             "sk-learn needs to be installed to use the sk_learn adapter"
         ) from e
 
-    def inner(data: np.ndarray) -> tuple[Iterable[np.ndarray], C]:
+    def inner(
+        data: np.ndarray, elements: np.ndarray
+    ) -> tuple[Collection[np.ndarray], C]:
         clusterer: C = sk.clone(base_clusterer)  # type: ignore
-        if len(data) <= 1:
-            return (np.arange(len(data)),), clusterer
+        masked_data = data[elements]
+        if len(masked_data) <= 1:
+            return (np.arange(len(masked_data)),), clusterer
 
-        labels = np.unique(clusterer.fit_predict(data))  # type: ignore
+        labels = np.unique(clusterer.fit_predict(masked_data))  # type: ignore
 
         # -1 indicates noise, we don't do anything with it
         if -1 in labels:
@@ -108,6 +111,6 @@ def sk_learn(base_clusterer: C) -> Clusterer[C]:
             labels = labels[~noise_points]
 
         c = clusterer.labels_ == labels[:, np.newaxis]  # type: ignore
-        return map(np.flatnonzero, c), clusterer
+        return [np.flatnonzero(idx) for idx in c], clusterer
 
     return inner
