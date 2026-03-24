@@ -24,7 +24,7 @@ jobs:
       - name: git checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+        uses: cachix/install-nix-action@v31
       - name: Check Nixpkgs inputs
         uses: DeterminateSystems/flake-checker-action@main
         with:
