@@ -28,7 +28,7 @@ class Cover(Protocol):
     It is expected that these cover the dataset however no effort is made to
     enforce this constraint.
 
-    Specifcially we require that you can iterate over the sets in the cover and
+    Specifically we require that you can iterate over the sets in the cover and
     that you can report the number of cover elements. In particular this means
     a list of arrays or a set of arrays will work. It is unlikely that you will
     actually implement this protocol, what you probably want is
