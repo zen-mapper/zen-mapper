@@ -147,8 +147,8 @@ plt.show()
 # connected. So we define the following trivial clusterer.
 
 
-def trivial(data: np.ndarray):
-    return [np.arange(len(data))], None
+def trivial(data: np.ndarray, elements: np.ndarray):
+    return [np.arange(elements.size)], None
 
 
 # %%
