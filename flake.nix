@@ -30,9 +30,9 @@
         value = pkgs."${python}".pkgs.callPackage ./nix/zen-mapper.nix {};
       })
       [
+        "python314"
         "python313"
         "python312"
-        "python311"
       ]
     );
 
