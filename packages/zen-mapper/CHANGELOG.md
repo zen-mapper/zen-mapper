@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed a bug where empty nodes could slip into the mapper graph
+- Fixed a bug where mapper tried to cluster empty cover elements
 
 ## [0.3.0] - 2025-06-02
 

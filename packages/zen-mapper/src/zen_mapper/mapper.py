@@ -59,17 +59,19 @@ def mapper(
     cover_elements = map(np.array, cover_scheme(projection))
 
     for i, element in enumerate(cover_elements):
+        if len(element) == 0:
+            logger.info("Cover element %d is empty", i)
+            cover_id.append(list())
+            continue
+
         logger.info("Clustering cover element %d", i)
         clusters, meta = clusterer(data, element)
         logger.info("Found %d clusters", len(clusters))
         metadata.append(meta)
-        if clusters:
-            m = len(nodes)
-            n = len(clusters)
-            cover_id.append(list(range(m, m + n)))
-            nodes.extend(element[cluster] for cluster in clusters)
-        else:
-            cover_id.append(list())
+        m = len(nodes)
+        n = len(clusters)
+        cover_id.append(list(range(m, m + n)))
+        nodes.extend(element[cluster] for cluster in clusters)
 
     return MapperResult(
         nodes=nodes,
