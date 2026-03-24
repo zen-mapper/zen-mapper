@@ -96,15 +96,17 @@ def sk_learn(base_clusterer: C) -> Clusterer[C]:
 
         labels = np.unique(clusterer.fit_predict(data))  # type: ignore
 
+        # -1 indicates noise, we don't do anything with it
         if -1 in labels:
+            noise_points = labels == -1
             logger.warning(
-                "the clusterer has labeled some points as noise, "
-                "they are being discarded"
+                "the clusterer has labeled %d points as noise, "
+                "they are being discarded",
+                noise_points.size(),
             )
 
-        labels = labels[
-            labels != -1
-        ]  # -1 indicates noise, we don't do anything with it
+            labels = labels[~noise_points]
+
         c = clusterer.labels_ == labels[:, np.newaxis]  # type: ignore
         return map(np.flatnonzero, c), clusterer
 
