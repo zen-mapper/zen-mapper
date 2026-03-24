@@ -56,7 +56,10 @@ def to_networkx(komplex: Komplex):
 C = TypeVar("C")
 
 
-def sk_learn(base_clusterer: C) -> Clusterer[np.ndarray, C]:
+def sk_learn(
+    base_clusterer: C,
+    precomputed: bool | None = None,
+) -> Clusterer[np.ndarray, C]:
     """Wraps a scikit-learn clusterer for use with zen-mapper.
 
     This function acts as an adapter, allowing scikit-learn's clustering
@@ -70,6 +73,11 @@ def sk_learn(base_clusterer: C) -> Clusterer[np.ndarray, C]:
         This object should have a `fit_predict` method and a `labels_`
         attribute after fitting, which is standard for scikit-learn
         clusterers.
+
+    precomputed : bool, optional
+        True if the scikit-learn algorithm is expecting a distance matrix. If
+        not specified the adapter attempts to detect this from
+        `base_clusterer`.
 
     Returns
     -------
@@ -89,11 +97,21 @@ def sk_learn(base_clusterer: C) -> Clusterer[np.ndarray, C]:
             "sk-learn needs to be installed to use the sk_learn adapter"
         ) from e
 
+    if precomputed is None:
+        precomputed = getattr(base_clusterer, "metric", "") == "precomputed"
+
     def inner(
-        data: np.ndarray, elements: np.ndarray
+        data: np.ndarray,
+        elements: np.ndarray,
     ) -> tuple[Collection[np.ndarray], C]:
+
         clusterer: C = sk.clone(base_clusterer)  # type: ignore
-        masked_data = data[elements]
+
+        if precomputed:
+            masked_data = data[np.ix_(elements, elements)]
+        else:
+            masked_data = data[elements]
+
         if len(masked_data) <= 1:
             return (np.arange(len(masked_data)),), clusterer
 
