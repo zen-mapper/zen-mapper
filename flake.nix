@@ -10,13 +10,21 @@
     nixpkgs,
   }: let
     system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
+    overlay = import ./nix/overlay.nix;
+    pkgs = import nixpkgs {
+      inherit system;
+      overlays = [ overlay ];
+    };
   in {
     formatter.${system} = pkgs.alejandra;
 
-    packages.${system}.default = pkgs.python3Packages.callPackage ./nix/zen-mapper.nix {};
+    packages.${system} = {
+      default = pkgs.python3Packages.zen-mapper;
+      zen-mapper = pkgs.python3Packages.zen-mapper;
+      kaiju-mapper = pkgs.python3Packages.kaiju-mapper;
+    };
 
-    overlays.default = import ./nix/overlay.nix;
+    overlays.default = overlay;
 
     templates.default = {
       path = ./nix/templates/minimal;
