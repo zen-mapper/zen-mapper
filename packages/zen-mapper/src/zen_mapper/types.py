@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Collection, Iterable, Iterator
 from dataclasses import dataclass
 from itertools import combinations
 from typing import Generic, Protocol, Self, TypeVar
@@ -15,7 +15,11 @@ __all__ = [
     "Simplex",
 ]
 
+# Clusterer Metadata
 M = TypeVar("M", covariant=True)
+
+# High dimensional data type
+H = TypeVar("H", contravariant=True)
 
 
 class Cover(Protocol):
@@ -286,32 +290,81 @@ class Komplex:
             yield from simplex.vertices
 
 
-class Clusterer(Protocol[M]):
-    """A callable that partitions a dataset.
+class Clusterer(Protocol[H, M]):
+    """
+    A protocol defining a callable that partitions a dataset into disjoint groups.
 
-    A clusterer takes a dataset and divides it into distinct groups,
-    known as a partition. A partition is a collection of arrays, where each array
-    contains indices referencing the original dataset. These index arrays
-    must collectively include all data points from the original dataset,
-    and no data point should belong to more than one array (i.e., the
-    arrays are disjoint and cover the entire dataset).
+    A `Clusterer` takes a dataset and a subset of its indices, returning a
+    partition and associated metadata.
 
-    For example, for a dataset with 6 elements, `[[1, 2, 3], [0, 4], [5]]` is a
-    valid partition. However, `[[1, 2, 3], [4], [5]]` is not valid because the
-    element at index `0` is missing. Similarly, `[[1, 2, 3], [0, 4], [0, 5]]`
-    is not valid because the element at index `0` appears in multiple arrays.
+    Methods
+    -------
+    __call__(data, elements)
+        Partition the specified elements of the dataset.
 
-    In addition to the partition, the clusterer also produces metadata.
-    The clusterer, when called, must return a tuple containing two elements:
-    the partition (an iterable of NumPy arrays, where each array holds indices)
-    and the associated metadata. If there is no meaningful metadata it should
-    return None.
+    Notes
+    -----
+    It is assumed that the returned partition satisfies the following properties:
 
-    For a more concrete example of how to specify a custom clusterer for use in
-    zen mapper see the example :doc:`/examples/custom_clusterer`.
+    1. **Disjointness**: No index from `elements` appears in more than one
+       partition array
+    2. **Exhaustiveness**: The union of all partition arrays exactly
+       equals the set of indices into `elements`
+    3. **Non-Empty**: No partition element is empty
+
+    For a dataset with 6 elements, `[[1, 2, 3], [0, 4], [5]]` is a valid
+    partition. While the following are considered invalid:
+
+    - `[[1, 2, 3], [4], [5]]` (missing index 0)
+    - `[[1, 2, 3], [0, 4], [0, 5]]` (index 0 is duplicated)
+    - `[[1, 2, 3], [0, 4], [], [5]]` (there is an empty partition element)
+
+    If no meaningful metadata is produced by the clustering algorithm,
+    the second element of the returned tuple should be `None`.
+
+    See Also
+    --------
+    :doc:`/examples/custom_clusterer` : A narrated example of implementing a clusterer
+
+    :func:`~zen_mapper.adapters.sk_learn` : An example clusterer defined in `zen_mapper`
     """
 
-    def __call__(self, data: np.ndarray) -> tuple[Iterable[np.ndarray], M]: ...
+    def __call__(
+        self,
+        data: H,
+        elements: np.ndarray,
+    ) -> tuple[Collection[np.ndarray], M]:
+        """Partition a subset of the dataset into disjoint groups.
+
+        Parameters
+        ----------
+        data : H
+            The full dataset object.
+        elements : np.ndarray
+            An array of indices referencing the data points within `data`
+            that are to be clustered.
+
+        Returns
+        -------
+        partition : Collection[np.ndarray]
+            A Collection of NumPy arrays. Each array contains indices into
+            `elements`. The collection must form a partition of `elements`.
+        metadata : M
+            Associated metadata produced by the clustering process. Returns
+            None if no meaningful metadata is generated.
+
+        See Also
+        --------
+        Clusterer : The protocol defining the expected behavior and
+            partitioning constraints.
+
+        Examples
+        --------
+        >>> # If elements is [0, 2, 4, 6, 8]
+        >>> # A valid return value might look like:
+        >>> ([np.array([1, 2]), np.array([0, 4]), np.array([3])], None)
+        """
+        ...
 
 
 @dataclass

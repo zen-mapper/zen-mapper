@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Change
+
+- The clusterer protocol requires passing in the global dataset along with the
+  indices to cluster now.
+
 ### Fixed
 
 - Fixed a bug where empty nodes could slip into the mapper graph

@@ -11,14 +11,15 @@ __all__ = ["mapper"]
 
 logger = logging.getLogger("zen_mapper")
 
-M = TypeVar("M")
+M = TypeVar("M")  # Clusterer metadata
+H = TypeVar("H")  # High dimensional data
 
 
 def mapper(
-    data: np.ndarray,
+    data: H,
     projection: np.ndarray,
     cover_scheme: CoverScheme,
-    clusterer: Clusterer[M],
+    clusterer: Clusterer[H, M],
     dim: int | None,
     min_intersection: int = 1,
 ) -> MapperResult[M]:
@@ -50,9 +51,6 @@ def mapper(
         - nerve: A complete list of simplices.
         - cover: List of list(indices) corresponding to elements of the cover.
     """
-    assert len(data) == len(projection), (
-        "the entries in projection have to correspond to entries in data"
-    )
 
     nodes = list()
     cover_id = list()
@@ -62,15 +60,14 @@ def mapper(
 
     for i, element in enumerate(cover_elements):
         logger.info("Clustering cover element %d", i)
-        clusters, meta = clusterer(data[element])
+        clusters, meta = clusterer(data, element)
+        logger.info("Found %d clusters", len(clusters))
         metadata.append(meta)
-        new_nodes = [element[cluster] for cluster in clusters if len(cluster)]
-        logger.info("Found %d clusters", len(new_nodes))
-        if new_nodes:
+        if clusters:
             m = len(nodes)
-            n = len(new_nodes)
+            n = len(clusters)
             cover_id.append(list(range(m, m + n)))
-            nodes.extend(new_nodes)
+            nodes.extend(element[cluster] for cluster in clusters)
         else:
             cover_id.append(list())
 
