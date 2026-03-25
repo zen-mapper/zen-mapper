@@ -125,7 +125,7 @@ def sk_learn(
             logger.warning(
                 "the clusterer has labeled %d points as noise, "
                 "they are being discarded",
-                noise_points.size(),
+                noise_points.size,
             )
 
             labels = labels[~noise_points]
