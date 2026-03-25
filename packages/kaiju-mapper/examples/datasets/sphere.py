@@ -24,8 +24,19 @@ plt.show()
 # %%
 # Nested Spheres
 # ==============
-# You can sample from multiple spheres by specify multiple radii.
-data = sphere(dim=1, radius=[2, 4], num_samples=250, seed=0xDEADBEEF)
+#
+# You can sample from multiple spheres using `np.vstack`
+import numpy as np
+
+rng = np.random.default_rng(0xDEADBEEF)
+
+data = np.vstack(
+    (
+        sphere(dim=1, radius=2, num_samples=250, seed=rng),
+        sphere(dim=1, radius=4, num_samples=250, seed=rng),
+    )
+)
+
 plt.scatter(data[:, 0], data[:, 1])
 plt.gca().axis("equal")
 plt.show()

@@ -3,14 +3,13 @@ Methods for generating synthetic topological data
 """
 
 import numpy as np
-import numpy.typing as npt
 
 from kaiju_mapper.types import Seed
 
 
 def sphere(
     dim: int,
-    radius: float | npt.ArrayLike = 1,
+    radius: float | None = None,
     num_samples: int = 1,
     seed: Seed | None = None,
 ) -> np.ndarray:
@@ -22,9 +21,8 @@ def sphere(
     ----------
     dim : np.ndarray
         The dimension of the sphere to sample from.
-    radius : float | ArrayLike
-        The radius of the sphere to sample from. If multiple radii are passed
-        then data will be sampled uniformly from circles of each radius.
+    radius : float | None
+        The radius of the sphere to sample from. Defaults to 1.
     num_samples : int
         Number of points to sample.
     seed : Seed | None
@@ -48,34 +46,29 @@ def sphere(
     (4, 3)
     >>> np.linalg.norm(data, axis=1)
     array([5., 5., 5., 5.])
-
-    >>> import numpy as np
-    >>> data = sphere(dim=2, radius=[1, 2], num_samples=5, seed=42)
-    >>> data.shape
-    (5, 3)
-    >>> np.linalg.norm(data, axis=1)
-    array([2., 2., 2., 2., 1.])
     """
+
+    # Initialize variables
+
+    rng = np.random.default_rng(seed)
+
+    # Validate input
+
     if num_samples < 1:
         raise ValueError("num_samples must be > 0")
 
     if dim <= 0:
         raise ValueError("dim must be at least 1")
 
-    rng = np.random.default_rng(seed)
+    if radius is not None and radius <= 0:
+        raise ValueError(f"radius must be positive, got {radius}")
 
-    radius = np.array(radius)
-
-    if radius.ndim > 1:
-        raise ValueError
-
-    if radius.ndim == 1:
-        probabilities = np.sqrt(radius, dtype=float)
-        probabilities /= np.sum(probabilities, dtype=float)
-        ind = rng.choice(len(radius), size=num_samples, p=probabilities)
-        radius = radius[ind].reshape(-1, 1)
+    # Sample sphere
 
     result = rng.normal(size=(num_samples, dim + 1))
     result /= np.linalg.norm(result, axis=1)[:, np.newaxis]
-    result *= radius
+
+    if radius is not None:
+        result *= radius
+
     return result
