@@ -29,3 +29,12 @@ def test_mean(dimension):
     data = sphere(dim=dimension, num_samples=10_000)
 
     assert_allclose(np.mean(data), 0, atol=0.015)
+
+
+@given(dimension=dimension, num_samples=num_samples, radius=radius)
+def test_on_sphere_center(dimension, num_samples, radius):
+    center = np.zeros(dimension + 1, dtype=float)
+    center[0] = 1
+    data = sphere(dim=dimension, center=center, num_samples=num_samples, radius=radius)
+
+    assert_allclose(np.linalg.norm(data - center, axis=1), radius)
