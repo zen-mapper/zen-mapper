@@ -10,24 +10,21 @@ will correspond to the standard deviation.
 # %%
 # Generate Data
 # =============
+#
+# Here we will use sphere generator from kaiju mapper to generate a dataset
 import matplotlib.pyplot as plt
 import numpy as np
+from kaiju_mapper.datasets import sphere
 
-# For reproducibility
 rng = np.random.default_rng(123)
 
+circles = (
+    sphere(dim=1, num_samples=100, seed=rng),
+    sphere(dim=1, num_samples=400, radius=2, center=(3, 0), seed=rng),
+    sphere(dim=1, num_samples=100, radius=1, center=(3, 0), seed=rng),
+)
 
-def generate_circle(n_points=100, radius=1, center_x=0, center_y=0):
-    theta = rng.uniform(0, 2 * np.pi, n_points)
-    x = radius * np.cos(theta) + center_x
-    y = radius * np.sin(theta) + center_y
-    return np.c_[x, y]
-
-
-circle1 = generate_circle()
-circle2 = generate_circle(400, 2, 3, 0)
-circle3 = generate_circle(100, 1, 3, 0)
-data = np.vstack((circle1, circle2, circle3))
+data = np.vstack(circles)
 
 plt.scatter(data[:, 0], data[:, 1])
 plt.show()

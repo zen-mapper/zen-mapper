@@ -104,6 +104,7 @@ result = mapper(
 # :func:`networkx <kaiju_mapper.adapters.to_networkx>` adapter to produce a
 # networkx graph which can be used for visualization.
 import networkx as nx
+
 from kaiju_mapper.adapters import to_networkx
 
 # Convert to a networkx graph for visualization
