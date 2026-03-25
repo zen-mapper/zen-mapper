@@ -16,6 +16,7 @@ import numpy as np
 # For reproducibility
 rng = np.random.default_rng(123)
 
+
 def generate_circle(n_points=100, radius=1, center_x=0, center_y=0):
     theta = rng.uniform(0, 2 * np.pi, n_points)
     x = radius * np.cos(theta) + center_x
@@ -34,8 +35,9 @@ plt.show()
 # %%
 # Implement Mapper
 # ================
-import zen_mapper as zm
 from sklearn.cluster import DBSCAN
+
+import zen_mapper as zm
 
 cover_scheme = zm.Width_Balanced_Cover(n_elements=7, percent_overlap=0.2)
 projection = data[:, 0]
