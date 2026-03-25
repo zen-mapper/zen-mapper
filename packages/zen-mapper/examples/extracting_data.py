@@ -14,11 +14,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # For reproducibility
-np.random.set_state(np.random.RandomState().get_state(137))
-
+rng = np.random.default_rng(123)
 
 def generate_circle(n_points=100, radius=1, center_x=0, center_y=0):
-    theta = np.random.uniform(0, 2 * np.pi, n_points)
+    theta = rng.uniform(0, 2 * np.pi, n_points)
     x = radius * np.cos(theta) + center_x
     y = radius * np.sin(theta) + center_y
     return np.c_[x, y]
