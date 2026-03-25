@@ -29,11 +29,11 @@ from kaiju_mapper.datasets import sphere
 
 rng = np.random.default_rng(seed=0xDEADBEEF)
 
-data = sphere(
-    dim=1,
-    radius=[0.4, 1],
-    num_samples=10_000,
-    seed=rng,
+data = np.vstack(
+    (
+        sphere(dim=1, radius=0.4, num_samples=5_000, seed=rng),
+        sphere(dim=1, radius=1, num_samples=5_000, seed=rng),
+    )
 )
 
 # Add some noise to our samples
