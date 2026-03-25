@@ -5,6 +5,7 @@ from collections.abc import Collection
 from typing import TypeVar
 
 import numpy as np
+import numpy.typing as npt
 
 from zen_mapper.types import Clusterer, Komplex
 
@@ -101,16 +102,17 @@ def sk_learn(
         precomputed = getattr(base_clusterer, "metric", "") == "precomputed"
 
     def inner(
-        data: np.ndarray,
+        data: npt.ArrayLike,
         elements: np.ndarray,
     ) -> tuple[Collection[np.ndarray], C]:
+        _data = np.asarray(data)
 
         clusterer: C = sk.clone(base_clusterer)  # type: ignore
 
         if precomputed:
-            masked_data = data[np.ix_(elements, elements)]
+            masked_data = _data[np.ix_(elements, elements)]
         else:
-            masked_data = data[elements]
+            masked_data = _data[elements]
 
         if len(masked_data) <= 1:
             return (np.arange(len(masked_data)),), clusterer
