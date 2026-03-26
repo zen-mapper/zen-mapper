@@ -117,7 +117,10 @@ def _ad_test(data: np.ndarray) -> float:
         # The sample size is too small for the ad_test to be meaningful
         return 0
 
-    result = anderson(data)
+    result = anderson(
+        data,
+        method="interpolate",
+    )
 
     return result.statistic * (1 + (4 / n) - (5 / n) ** 2)  # type: ignore
 
