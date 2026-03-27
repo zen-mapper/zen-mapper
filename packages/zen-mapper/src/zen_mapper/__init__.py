@@ -8,8 +8,10 @@ from .cover import (
     rectangular_cover,
 )
 from .mapper import mapper
+from .types import MapperResult
 
 __all__ = [
+    "MapperResult",
     "Data_Balanced_Cover",
     "Width_Balanced_Cover",
     "mapper",

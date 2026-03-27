@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - There is now a `Data_Balanced_Cover` which covers a one-dimensional data set
   with even bins.
+- `MapperResult` is now exported at the top level
 
 ### Change
 
