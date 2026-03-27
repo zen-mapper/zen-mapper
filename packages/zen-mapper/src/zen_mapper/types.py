@@ -392,15 +392,14 @@ class MapperResult(Generic[M]):
         Each inner list contains the indices of the original data points that
         fall into a specific cover element. This provides a mapping from the
         original dataset to the cover.
-    cluster_metadata : list[M]
-        A list of metadata objects, where each object corresponds to a
-        cluster (node) in the Mapper graph. The type `M` is generic,
-        allowing for flexible storage of any additional information
-        relevant to each cluster, such as cluster statistics, labels,
-        or other derived properties.
+    cluster_metadata : list[M | None]
+        A list of clustering metadata objects. The object `cluster_metadata[i]`
+        corresponds to whatever metadata the clusterer produced on cover
+        element `i`. If cover element `i` was empty this will
+        `cluster_metadata[i]` is `None`.
     """
 
     nodes: list[np.ndarray]
     nerve: Komplex
     cover: list[list[int]]
-    cluster_metadata: list[M]
+    cluster_metadata: list[M | None]

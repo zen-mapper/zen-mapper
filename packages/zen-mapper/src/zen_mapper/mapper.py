@@ -62,15 +62,18 @@ def mapper(
         if len(element) == 0:
             logger.info("Cover element %d is empty", i)
             cover_id.append(list())
+            metadata.append(None)
             continue
 
         logger.info("Clustering cover element %d", i)
         clusters, meta = clusterer(data, element)
         logger.info("Found %d clusters", len(clusters))
-        metadata.append(meta)
+
         m = len(nodes)
         n = len(clusters)
         cover_id.append(list(range(m, m + n)))
+        metadata.append(meta)
+
         nodes.extend(element[np.asarray(cluster)] for cluster in clusters)
 
     return MapperResult(
