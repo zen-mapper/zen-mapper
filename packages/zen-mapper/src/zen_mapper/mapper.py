@@ -56,7 +56,7 @@ def mapper(
     cover_id = list()
     metadata = list()
 
-    cover_elements = map(np.array, cover_scheme(projection))
+    cover_elements = map(np.asarray, cover_scheme(projection))
 
     for i, element in enumerate(cover_elements):
         if len(element) == 0:
