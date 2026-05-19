@@ -65,6 +65,7 @@ sphinx_gallery_conf = {
     "examples_dirs": "../../examples",
     "gallery_dirs": "examples",
     "filename_pattern": "/*.py",
+    "matplotlib_animations": True,
 }
 
 # -- Options for KaTeX rendering ----------------------------------------------

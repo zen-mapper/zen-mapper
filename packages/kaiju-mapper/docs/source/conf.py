@@ -44,4 +44,5 @@ sphinx_gallery_conf = {
     "filename_pattern": "/*.py",
     "remove_config_comments": True,
     "download_all_examples": False,
+    "matplotlib_animations": True,
 }
