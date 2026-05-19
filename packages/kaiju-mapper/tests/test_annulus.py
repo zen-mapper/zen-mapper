@@ -16,7 +16,7 @@ def radii(draw):
     )
     major_radius = draw(
         st.floats(
-            min_value=minor_radius+0.1,
+            min_value=minor_radius + 0.1,
             exclude_min=True,
             max_value=1e10,
             allow_infinity=False,
@@ -65,4 +65,3 @@ def test_mean(dimension, radii):
     )
 
     assert np.linalg.norm(np.mean(data, axis=0)) < 0.1
-
