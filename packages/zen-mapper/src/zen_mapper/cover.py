@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import logging
+from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
 
 __all__ = [
     "rectangular_cover",
-    "Width_Balanced_Cover",
     "Data_Balanced_Cover",
+    "width_balanced_cover",
 ]
 
 logger = logging.getLogger("zen_mapper")
@@ -117,62 +118,96 @@ def _grid(
     return np.stack(grid, axis=-1).reshape(-1, len(start))
 
 
-class Width_Balanced_Cover:
-    """A cover comprised of equally sized rectangular elements
+class WidthBalancedMetadata(TypedDict):
+    """Geometric information about a width balanced cover
 
-    Parameters
-    ----------
-    n_elements : ArrayLike
-        The number of covering elements along each dimension. If the data is
-        dimension $d$ and this is a scalar $n$ this results in $n^d$ covering elements.
-    percent_overlap : float
-        a number between 0 and 1 representing the ammount of overlap between
-        adjacent covering elements.
-
-
-    Raises
-    ------
-    Value Error
-        if n_elements < 1
-    Value Error
-        if percent_overlap is not in (0,1)
+    After fitting a cover using :func:`width_balanced_cover` this contains all
+    the information you would need to reconstruct the cover using
+    :func:`rectangular_cover`, fit new data, or visualize the cover
+    geometrically.
     """
 
-    def __init__(self, n_elements: npt.ArrayLike, percent_overlap: float):
-        n_elements = np.array([n_elements], dtype=int)
+    centers: np.ndarray
+    """The coordinates of the centers for each rectangular covering element."""
+    widths: np.ndarray
+    """The calculated width of the covering elements across each dimension."""
 
-        if np.any(n_elements < 1):
-            raise ValueError("n_elements must be at least 1")
 
-        if not 0 < percent_overlap < 1:
-            raise ValueError("percent_overlap must be in the range (0,1)")
+def width_balanced_cover(
+    n_elements: npt.ArrayLike,
+    percent_overlap: float,
+    data: npt.ArrayLike,
+) -> tuple[list[np.ndarray], WidthBalancedMetadata]:
+    """Compute a cover of equally sized rectangular elements.
 
-        self.n_elements = n_elements
-        self.percent_overlap = percent_overlap
+    The widths of the intervals are calculated so that the entire range of the
+    data is spanned by the desired number of elements with the specified
+    overlap percentage.
 
-    def __call__(self, data):
-        logger.info("Computing the width balanced cover")
+    Args:
+        n_elements: The number of covering elements along each dimension. If
+            the data is dimension :math:`d` and this is a scalar :math:`n` this
+            results in :math:`n^d` covering elements.
+        percent_overlap: A number between 0 and 1 representing the amount of
+            overlap between adjacent covering elements.
+        data: The input data array to be covered. Of shape `(n_samples,
+            n_features)` or `(n_samples,)`.
 
-        if len(data.shape) == 1:
-            data = data.reshape(-1, 1)
+    Returns:
+        A tuple `(cover, metadata)` where `cover` is the fitted cover and `metadata`
+        is a dictionary containing geometric properties of the generated cover.
+        See :class:`WidthBalancedMetadata` for more information.
 
-        upper_bound = np.max(data, axis=0).astype(float)
-        lower_bound = np.min(data, axis=0).astype(float)
+    Raises:
+        ValueError: If any value in `n_elements` is  less than 1.
+        ValueError: If `percent_overlap` is not in the open interval (0,1)
+    """
 
-        width = (upper_bound - lower_bound) / (
-            self.n_elements - (self.n_elements - 1) * self.percent_overlap
+    n_elements = np.atleast_1d(n_elements)
+
+    data = np.asarray(data, dtype=float)
+
+    if data.ndim < 2:
+        logger.warning(
+            "Data has shape %s, reshaping to (%s, 1)",
+            data.shape,
+            data.size,
         )
-        width = width.flatten()
-        self.width = width
+        data = data.reshape(-1, 1)
 
-        # Compute the centers of the "lower left" and "upper right" cover
-        # elements
-        upper_bound -= width / 2
-        lower_bound += width / 2
+    if data.ndim > 2:
+        raise ValueError(
+            f"Shape of data must be (n_samples, n_features), got f{data.shape}"
+        )
 
-        centers = _grid(lower_bound, upper_bound, self.n_elements)
-        self.centers = centers
-        return rectangular_cover(centers, width, data)
+    if np.any(n_elements < 1):
+        raise ValueError(f"n_elements must be at least 1, got {n_elements}")
+
+    if not 0 < percent_overlap < 1:
+        raise ValueError(
+            f"percent_overlap must be in the range (0,1), got {percent_overlap}"
+        )
+
+    logger.info("Computing the width balanced cover")
+
+    upper_bound = np.max(data, axis=0)
+    lower_bound = np.min(data, axis=0)
+
+    width = (upper_bound - lower_bound) / (
+        n_elements - (n_elements - 1) * percent_overlap
+    )
+    width = width.flatten()
+
+    # Compute the centers of the "lower left" and "upper right" cover
+    # elements
+    upper_bound -= width / 2
+    lower_bound += width / 2
+
+    centers = _grid(lower_bound, upper_bound, n_elements)
+    return rectangular_cover(centers, width, data), {
+        "centers": centers,
+        "widths": width,
+    }
 
 
 class Data_Balanced_Cover:
