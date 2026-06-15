@@ -70,12 +70,11 @@ clusterer = zm.sk_learn(sk)
 # %%
 # Computing the mapper graph
 # ==========================
-cover_scheme = zm.Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
+cover, _ = zm.width_balanced_cover(n_elements=3, percent_overlap=0.4, data=projection)
 
 result = zm.mapper(
     data=data,
-    projection=projection,
-    cover_scheme=cover_scheme,
+    cover=cover,
     clusterer=clusterer,
     dim=1,
 )

@@ -36,15 +36,18 @@ from sklearn.cluster import DBSCAN
 
 import zen_mapper as zm
 
-cover_scheme = zm.Width_Balanced_Cover(n_elements=7, percent_overlap=0.2)
 projection = data[:, 0]
+cover, _ = zm.width_balanced_cover(
+    n_elements=7,
+    percent_overlap=0.2,
+    data=projection,
+)
 clusterer = zm.sk_learn(DBSCAN(eps=0.5))
 
 result = zm.mapper(
     data=data,
-    projection=projection,
     clusterer=clusterer,
-    cover_scheme=cover_scheme,
+    cover=cover,
     dim=1,
 )
 

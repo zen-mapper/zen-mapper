@@ -23,8 +23,8 @@ logging.basicConfig(level=logging.INFO)
 # %%
 # Generating data
 # ===============
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 theta = np.linspace(0, 2 * np.pi, 50)
 data = np.c_[np.cos(theta), np.sin(theta)]
@@ -35,15 +35,18 @@ plt.show()
 # Running mapper
 # ===============
 import networkx as nx
-from zen_mapper.adapters import to_networkx
 from sklearn.cluster import AgglomerativeClustering
-from zen_mapper.adapters import sk_learn
-from zen_mapper import mapper, Width_Balanced_Cover
+
+from zen_mapper import mapper, width_balanced_cover
+from zen_mapper.adapters import sk_learn, to_networkx
 
 projection = data[:, 0]
 
-cover_scheme = Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
-cover = cover_scheme(projection)
+cover, _ = width_balanced_cover(
+    n_elements=3,
+    percent_overlap=0.4,
+    data=projection,
+)
 
 sk = AgglomerativeClustering(
     linkage="single",
@@ -55,8 +58,7 @@ clusterer = sk_learn(sk)
 
 result = mapper(
     data=data,
-    projection=projection,
-    cover_scheme=cover_scheme,
+    cover=cover,
     clusterer=clusterer,
     dim=1,
 )

@@ -27,8 +27,11 @@ plt.show()
 # =================
 import zen_mapper as zm
 
-cover_scheme = zm.Width_Balanced_Cover(n_elements=3, percent_overlap=0.4)
-cover = cover_scheme(projection)
+cover, _ = zm.width_balanced_cover(
+    n_elements=3,
+    percent_overlap=0.4,
+    data=projection,
+)
 
 # %%
 # Defining a clusterer
@@ -44,8 +47,7 @@ clusterer = zm.sk_learn(sk)
 
 result = zm.mapper(
     data=data,
-    projection=projection,
-    cover_scheme=cover_scheme,
+    cover=cover,
     clusterer=clusterer,
     dim=1,
 )

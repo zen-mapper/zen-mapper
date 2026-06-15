@@ -145,14 +145,17 @@ plt.show()
 #
 # Now we have a clusterer compatible with zen-mapper.
 
-cover_scheme = zm.Width_Balanced_Cover(n_elements=5, percent_overlap=0.25)
-cover = cover_scheme(data)
+
 projection = data[:, 0]
+cover, _ = zm.width_balanced_cover(
+    n_elements=5,
+    percent_overlap=0.25,
+    data=projection,
+)
 
 result = zm.mapper(
     data=data,
-    projection=projection,
-    cover_scheme=cover_scheme,
+    cover=cover,
     clusterer=clusterer,
     dim=1,
 )
