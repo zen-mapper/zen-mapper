@@ -5,31 +5,13 @@ import logging
 import numpy as np
 import numpy.typing as npt
 
-from .types import Cover
-
 __all__ = [
-    "precomputed_cover",
     "rectangular_cover",
     "Width_Balanced_Cover",
     "Data_Balanced_Cover",
 ]
 
 logger = logging.getLogger("zen_mapper")
-
-
-def precomputed_cover(cover: Cover) -> CoverScheme:
-    """A precomputed cover
-
-    Parameters
-    ----------
-    cover : Cover
-        the precomputed cover to use
-    """
-
-    def inner(*_):
-        return cover
-
-    return inner  # type: ignore
 
 
 def rectangular_cover(
