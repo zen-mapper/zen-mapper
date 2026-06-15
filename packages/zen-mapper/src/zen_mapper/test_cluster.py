@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.cluster import DBSCAN
 
 from zen_mapper import mapper
-from zen_mapper.cover import precomputed_cover
 
 from .adapters import sk_learn
 
@@ -38,8 +37,7 @@ def test_non_array_cluster():
     data = np.empty(N_SAMPLES)
     mapper(
         data=data,
-        projection=data,
-        cover_scheme=precomputed_cover([np.arange(N_SAMPLES)]),
+        cover=[np.arange(N_SAMPLES)],
         clusterer=_trivial_cluster,
         dim=0,
     )

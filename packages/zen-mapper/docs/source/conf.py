@@ -49,6 +49,11 @@ intersphinx_mapping = {
     "networkx": ("https://networkx.org/documentation/stable/", None),
 }
 
+# Resolve type aliases to the alias themselves, not the aliased value
+autodoc_type_aliases = {
+    "Cover": ":type:`~zen_mapper.types.Cover`",
+}
+
 add_module_names = False
 
 typehints_defaults = "comma"

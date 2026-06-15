@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import numpy.typing as npt
 
-from .types import Cover, CoverScheme
+from .types import Cover
 
 __all__ = [
     "precomputed_cover",

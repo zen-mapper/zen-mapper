@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Collection, Iterable, Iterator
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass
 from itertools import combinations
-from typing import Generic, Protocol, Self, TypeVar
+from typing import Generic, Protocol, Self, TypeAlias, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -11,7 +11,6 @@ import numpy.typing as npt
 __all__ = [
     "Clusterer",
     "Cover",
-    "CoverScheme",
     "Komplex",
     "MapperResult",
     "Simplex",
@@ -23,67 +22,26 @@ M = TypeVar("M", covariant=True)
 # High dimensional data type
 H = TypeVar("H", contravariant=True)
 
+Cover: TypeAlias = Iterable[np.ndarray]
+"""Zen mapper expects covers to be encoded as an iterable of sets
 
-class Cover(Protocol):
-    """
-    Protocol for a cover
-
-    A set is represented as a numpy array of indices into the original data
-    set. For instance `[0, 4, 3]` represents the set with the 0th, 4th, and 3rd
-    elements from the original dataset. A cover is a collection of these sets.
-    It is expected that these cover the dataset however no effort is made to
-    enforce this constraint.
-
-    Specifically we require that you can iterate over the sets in the cover and
-    that you can report the number of cover elements. In particular this means
-    a list of arrays or a set of arrays will work. It is unlikely that you will
-    actually implement this protocol, what you probably want is
-    :class:`CoverScheme`.
-    """
-
-    def __len__(self: Self) -> int:
-        """
-        The number of sets in the cover.
-
-        Returns:
-            The number of sets in the cover.
-        """
-        ...
-
-    def __iter__(self: Self) -> Iterator[npt.ArrayLike]:
-        """
-        Returns an iterator over the sets in the cover.
-
-        Each element yielded by the iterator is expected to be array-like,
-        suitable for conversion to a NumPy array. The elements of these arrays
-        are indices into the original data set
-
-        Yields:
-            A set in the cover
-        """
-        ...
+Here each set is encoded as numpy array of indices into the original dataset.
+For instance `[0, 3, 4]` would be the set that represents the zeroth, third,
+and fourth elements in a dataset. Zen mapper does not enforce that invalid sets
+are not passed in. It is up to the caller to make sure that there are no
+duplicated entries and that every index is valid.
 
 
-class CoverScheme(Protocol):
-    """
-    Protocol for a cover scheme
+See Also:
+    :doc:`/examples/custom_cover`: A narrated example of implementing
+    a new cover
 
-    A cover scheme is a function or callable object which takes the projected
-    data and produces a `Cover` object. See the example
-    :doc:`/examples/custom_cover` for a more detailed look at how to create a
-    custom covering scheme.
-    """
+    :mod:`zen_mapper.cover`: Basic methods for fitting covers
 
-    def __call__(self: Self, data: np.ndarray) -> Cover:
-        """Generate a `Cover` from the input data.
-
-        Args:
-            data: The input data
-
-        Returns:
-            The generated cover.
-        """
-        ...
+    :doc:`ADR-0005 </decisions/0005-use-numpy-array-to-encode-cover-elements>`
+    and :doc:`ADR-0006 </decisions/0006-encode-covers-as-iterable>` for
+    rational behind this encoding.
+"""
 
 
 class Simplex(tuple[int, ...]):

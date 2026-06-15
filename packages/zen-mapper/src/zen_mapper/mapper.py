@@ -7,7 +7,7 @@ from typing import TypeVar
 
 import numpy as np
 
-from .types import Clusterer, CoverScheme, Komplex, MapperResult, Simplex
+from .types import Clusterer, Cover, Komplex, MapperResult, Simplex
 
 __all__ = ["mapper"]
 
@@ -19,8 +19,7 @@ H = TypeVar("H")  # High dimensional data
 
 def mapper(
     data: H,
-    projection: np.ndarray,
-    cover_scheme: CoverScheme,
+    cover: Cover,
     clusterer: Clusterer[H, M],
     dim: int | None,
     min_intersection: int = 1,
@@ -30,10 +29,7 @@ def mapper(
 
     Args:
         data: The high dimensional dataset
-        projection: The output of the lens/filter function on the data. Must have
-            the same number of elements as data.
-        cover_scheme: For cover generation. Should be a callable object that takes
-            a numpy array and returns a list of list(indices).
+        cover: A cover of `data`
         clusterer: A callable object that takes in a dataset and returns an
             iterator of numpy arrays which contain indices for clustered points.
         dim: The highest dimension of the mapper complex to compute.
@@ -50,7 +46,7 @@ def mapper(
     cover_id = list()
     metadata = list()
 
-    cover_elements = map(np.asarray, cover_scheme(projection))
+    cover_elements = map(np.asarray, cover)
 
     for i, element in enumerate(cover_elements):
         if len(element) == 0:
