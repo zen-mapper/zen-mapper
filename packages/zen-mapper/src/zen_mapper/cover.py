@@ -49,34 +49,55 @@ def rectangular_cover(centers, widths, data, tol=1e-9):
     )
 
 
-def _grid(start, stop, steps):
-    """Create an n-dimensional grid from start to stop with steps
+def _grid(
+    start: npt.ArrayLike,
+    stop: npt.ArrayLike,
+    steps: npt.ArrayLike,
+) -> np.ndarray:
+    """Create a flat coordinate grid from a set of N-dimensional bounds.
 
-    Parameters
-    ----------
-    start : ndarray
-        The point to start at
-    stop : ndarray
-        The point to stop at
-    steps : int | ndarray
-        The number of grid points for each direction
+    Args:
+        start: The starting coordinates for each dimension.
+        stop: The ending coordinates for each dimension, inclusive.
+        steps: The number of grid points sampled along each dimension. If an
+            integer, the same number of steps is taken acrosss all dimensions.
 
-    Raises
-    ------
+    Returns:
+        An array where each row represents a unique coordinate point in the grid.
 
-    ValueError
-        If len(start) != len(stop)
+    Raises:
+        ValueError: If `start`, `stop`, and `steps` cannot be broadcast to a
+            common shape
+        ValueError: If `steps` has non-integral dtype
+
+    Examples:
+        >>> _grid(start=[0,10], stop=[1, 20], steps=2)
+        array([[ 0., 10.],
+               [ 1., 10.],
+               [ 0., 20.],
+               [ 1., 20.]])
+
+        >>> _grid(start = [0,10], stop=[1,20], steps=[2,3])
+        array([[ 0., 10.],
+               [ 1., 10.],
+               [ 0., 15.],
+               [ 1., 15.],
+               [ 0., 20.],
+               [ 1., 20.]])
     """
+    start, stop = np.atleast_1d(start), np.atleast_1d(stop)
+    steps = np.asarray(steps)
 
-    if len(start) != len(stop):
-        raise ValueError("Start and stop points need to have same dimension")
+    if not np.issubdtype(steps.dtype, int):
+        raise ValueError("Steps must have an integral type")
 
     dims = (
         np.linspace(begin, end, num=num)
         for begin, end, num in np.broadcast(start, stop, steps)
     )
+
     grid = np.meshgrid(*dims)
-    return np.column_stack([dim.reshape(-1) for dim in grid])
+    return np.stack(grid, axis=-1).reshape(-1, len(start))
 
 
 class Width_Balanced_Cover:
