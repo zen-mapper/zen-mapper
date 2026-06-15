@@ -46,12 +46,12 @@ def rectangular_cover(
 
     Args:
         centers: The coordinates of the centers for each hyper-rectangle. Shape
-            should be (n_centers, n_features) or (n_centers,).
+            should be `(n_centers, n_features)` or `(n_centers,)`.
         widths: The width of the covering elements. Must be broadcastable
             against the feature dimensions (e.g., a scalar or a 1D array of
-            shape (n_features,)).
+            shape `(n_features,)`).
         data: The dataset to be partitioned into the cover elements. Shape
-            should be (n_samples, n_features) or (n_samples,).
+            should be `(n_samples, n_features)` or `(n_samples,)`.
         tol: A small numerical tolerance added to the boundary calculations to
             prevent floating-point precision issues for points resting exactly
             on an edge. Defaults to 1e-9.
