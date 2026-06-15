@@ -68,23 +68,18 @@ def rectangular_cover(
         :func:`data_balanced_cover` compute a cover where each element has the
         same number of data points.
     """
-
-    if len(centers.shape) == 1:
+    if centers.ndim == 1:
         centers = centers.reshape(-1, 1)
 
-    if len(data.shape) == 1:
+    if data.ndim == 1:
         data = data.reshape(-1, 1)
 
     distances = np.abs(data - centers[:, None])
-    return list(
-        map(
-            np.flatnonzero,
-            np.all(
-                distances * 2 - widths <= tol,
-                axis=2,
-            ),
-        )
+    in_bounds = np.all(
+        distances <= (widths + tol) / 2,
+        axis=2,
     )
+    return [np.flatnonzero(mask) for mask in in_bounds]
 
 
 def _grid(
