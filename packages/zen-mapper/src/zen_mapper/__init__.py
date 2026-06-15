@@ -4,7 +4,7 @@ import logging
 
 from .adapters import sk_learn, to_networkx
 from .cover import (
-    Data_Balanced_Cover,
+    data_balanced_cover,
     rectangular_cover,
     width_balanced_cover,
 )
@@ -13,7 +13,7 @@ from .types import MapperResult
 
 __all__ = [
     "MapperResult",
-    "Data_Balanced_Cover",
+    "data_balanced_cover",
     "width_balanced_cover",
     "mapper",
     "rectangular_cover",

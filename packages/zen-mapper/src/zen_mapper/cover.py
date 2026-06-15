@@ -8,8 +8,8 @@ import numpy.typing as npt
 
 __all__ = [
     "rectangular_cover",
-    "Data_Balanced_Cover",
     "width_balanced_cover",
+    "data_balanced_cover",
 ]
 
 logger = logging.getLogger("zen_mapper")
@@ -210,9 +210,12 @@ def width_balanced_cover(
     }
 
 
-class Data_Balanced_Cover:
-    r"""
-    A cover of 1D data with roughly equal data points per interval.
+def data_balanced_cover(
+    n_elements: int,
+    percent_overlap: float,
+    data: npt.ArrayLike,
+) -> tuple[list[np.ndarray], DataBalancedMetadata]:
+    r"""Compute a cover with roughly equal data points per interval
 
     The cover is constructed by partitioning the sorted indices :math:`[0, \dots, N-1]`
     into intervals of approximately equal size, then mapping those
@@ -228,88 +231,76 @@ class Data_Balanced_Cover:
 
     where :math:`k` is `n_elements`.
 
-    Parameters
-    ----------
-    n_elements : int
-        The number of intervals (cover elements) to create. Must be :math:`\ge 1`.
-    percent_overlap : float
-        The fractional overlap between adjacent intervals, :math:`0 <
-        \text{overlap} < 1`.
+    Args:
+        n_elements: The number of intervals (cover elements) to create. Must be
+            at least 1.
+        percent_overlap: The fractional overlap between adjacent intervals.
+            Must be between 0 and 1 exclusive.
 
-    Attributes
-    ----------
-    n_elements : int
-        The number of cover elements.
-    percent_overlap : float
-        The fractional overlap.
+    Returns:
+        A tuple `(cover, metadata)` where `cover` is the fitted cover and
+        `metadata` is a dictionary containing geometric properties of the
+        generated cover. See :class:`DataBalancedMetadata` for more
+        information.
 
-    Raises
-    ------
-    ValueError
-        If `n_elements` < 1 or `percent_overlap` is not in the range (0, 1).
+    Raises:
+        ValueError: If `n_elements` < 1 or `percent_overlap` is not in the
+            open range (0, 1).
 
-    Notes
-    -----
-    A `percent_overlap` of 0.5 means each interval shares approximately 50%
-    of its points with the subsequent interval.
+    Note:
+        A `percent_overlap` of 0.5 means each interval shares approximately 50%
+        of its points with the subsequent interval.
+
+    Examples:
+        >>> data = np.array([10, 11, 12, 40, 55, 60])
+        >>> cover, meta = data_balanced_cover(2, 0.5, data)
+        >>> cover
+        [array([0, 1, 2, 3]), array([2, 3, 4, 5])]
+        >>> [ data[e] for e in cover ]
+        [array([10, 11, 12, 40]), array([12, 40, 55, 60])]
+        >>> bounds = meta["bounds"]
+        >>> bounds
+        array([[0, 3],
+               [2, 5]])
+        >>> data[bounds]
+        array([[10, 40],
+               [12, 60]])
     """
 
-    def __init__(self, n_elements: int, percent_overlap: float):
-        self._cover = Width_Balanced_Cover(
-            n_elements=n_elements,
-            percent_overlap=percent_overlap,
+    data = np.atleast_1d(data)
+
+    if data.ndim != 1:
+        raise ValueError(
+            f"Data_Balanced_Cover only supports 1-dimensional input"
+            f"data but received data with shape: {data.shape}"
         )
-        self.n_elements = n_elements
-        self.percent_overlap = percent_overlap
 
-    def __call__(self, data: npt.ArrayLike):
-        """
-        Partition the input data into overlapping intervals containing
-        approximately equal numbers of points.
+    n = len(data)
 
-        This method sorts the input data and applies a width-balanced cover
-        to the indices. It then maps these index-based regions back to the
-        original data indices to create the balanced cover.
+    if n < n_elements:
+        raise ValueError("Number of data points must be >= n_elements")
 
-        Parameters
-        ----------
-        data : array_like
-            A 1-dimensional array of data points to be partitioned.
+    logger.info("Computing the data balanced cover")
 
-        Returns
-        -------
-        list of ndarray
-            A list containing the indices of the original data points
-            belonging to each cover element. Each element in the list is
-            an `np.ndarray`.
+    sort_idx = np.argsort(data)
+    idxs = np.arange(n)
+    cover_idxs, _ = width_balanced_cover(
+        n_elements=n_elements,
+        percent_overlap=percent_overlap,
+        data=idxs,
+    )
 
-        Raises
-        ------
-        ValueError
-            If the input `data` is not 1-dimensional.
-        ValueError
-            If the number of points in `data` is less than the requested
-            `n_elements`.
-        """
-        data = np.asarray(data, dtype=float)
+    cover = [sort_idx[g] for g in cover_idxs]
 
-        if data.ndim != 1:
-            raise ValueError(
-                f"Data_Balanced_Cover only supports 1-dimensional input"
-                f"(projected) data but received data with dim: {data.ndim}"
-            )
+    bounds = np.fromiter(
+        ((e[0], e[-1]) for e in cover),
+        dtype=np.dtype((int, 2)),
+        count=len(cover),
+    )
 
-        logger.info("Computing the data balanced cover")
+    return cover, {"bounds": bounds}
 
-        n = len(data)
 
-        if n < self.n_elements:
-            raise ValueError("Number of data points must be >= n_elements")
-
-        sort_idx = np.argsort(data)
-        idxs = np.arange(n)
-        cover_idxs = self._cover(idxs)
-
-        cover = [sort_idx[g] for g in cover_idxs]
-
-        return cover
+class DataBalancedMetadata(TypedDict):
+    bounds: np.ndarray
+    """The indices of the bounds for each interval. Shape `(num_intervals, 2)`"""
