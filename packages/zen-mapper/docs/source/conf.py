@@ -19,23 +19,42 @@ release = "0.3.0"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "myst_parser",
-    "autoapi.extension",
     "sphinx_gallery.gen_gallery",
     "sphinxcontrib.katex",
+    "sphinx_autodoc_typehints",
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = []
 
 # -- Other documentation -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#confval-intersphinx_mapping
+
+# -- Options for api docs ----------------------------------------------------
+
+autodoc_default_options = {
+    "members": True,
+    "ignore-module-all": False,
+}
+
+autodoc_typehints = "description"
+autodoc_typehints_format = "short"
+
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
 }
+
+add_module_names = False
+
+typehints_defaults = "comma"
+typehints_document_rtype = True
+typehints_use_rtype = False
+napoleon_use_rtype = False
+add_function_parentheses = False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -55,10 +74,6 @@ html_sidebars = {
         "navigation.html",
     ]
 }
-
-# -- Options for Api documentation --------------------------------------------
-autoapi_dirs = ["../../src/zen_mapper"]
-autoapi_ignore = ["**/test*.py"]
 
 # -- Options for example gallery ----------------------------------------------
 sphinx_gallery_conf = {

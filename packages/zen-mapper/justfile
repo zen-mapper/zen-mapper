@@ -24,8 +24,12 @@ test:
 check check:
 	nix build .#checks.x86_64-linux.{{check}}
 
+# Generate Api Docs
+doc-generate:
+	sphinx-apidoc --separate --force --no-toc --output-dir docs/source/api src "src/**/test*"
+
 # Build the docs
-doc-build:
+doc-build: doc-generate
 	cd docs && make dirhtml
 
 # Serve the docs

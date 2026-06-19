@@ -50,8 +50,8 @@ correctly. There is plenty of room left for some pretty trivial optimizations.
 :hidden:
 :maxdepth: 4
 examples/index
-autoapi/index
 contributing
 changelog
 decisions/index
+api/index
 ```
