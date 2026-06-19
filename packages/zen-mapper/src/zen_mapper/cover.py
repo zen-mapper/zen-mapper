@@ -30,7 +30,45 @@ def precomputed_cover(cover: Cover) -> CoverScheme:
     return inner  # type: ignore
 
 
-def rectangular_cover(centers, widths, data, tol=1e-9):
+def rectangular_cover(
+    centers: np.ndarray,
+    widths: np.ndarray,
+    data: np.ndarray,
+    tol: float = 1e-9,
+) -> list[np.ndarray]:
+    """Partition data points into multi-dimensional rectangular cover elements.
+
+    Note:
+        This is a low-level structural function that requires pre-computed
+        bounding box geometries. For most use cases, you should use
+        :func:`width_balanced_cover` or :func:`data_balanced_cover` instead, which handle
+        the geometry generation automatically.
+
+    Args:
+        centers: The coordinates of the centers for each hyper-rectangle. Shape
+            should be (n_centers, n_features) or (n_centers,).
+        widths: The width of the covering elements. Must be broadcastable
+            against the feature dimensions (e.g., a scalar or a 1D array of
+            shape (n_features,)).
+        data: The dataset to be partitioned into the cover elements. Shape
+            should be (n_samples, n_features) or (n_samples,).
+        tol: A small numerical tolerance added to the boundary calculations to
+            prevent floating-point precision issues for points resting exactly
+            on an edge. Defaults to 1e-9.
+
+    Returns:
+        A list of length `n_centers`. Each entry is a 1D array of integers
+        containing the row indices of `data` that fall inside that specific
+        rectangular cover element.
+
+    See Also:
+        :func:`width_balanced_cover`: compute a cover comprised of equally sized
+        rectangular elements.
+
+        :func:`data_balanced_cover` compute a cover where each element has the
+        same number of data points.
+    """
+
     if len(centers.shape) == 1:
         centers = centers.reshape(-1, 1)
 
@@ -106,9 +144,8 @@ class Width_Balanced_Cover:
     Parameters
     ----------
     n_elements : ArrayLike
-        the number of covering elements along each dimension. If the data is
-        dimension d this results in d^n covering elements.
-
+        The number of covering elements along each dimension. If the data is
+        dimension $d$ and this is a scalar $n$ this results in $n^d$ covering elements.
     percent_overlap : float
         a number between 0 and 1 representing the ammount of overlap between
         adjacent covering elements.
@@ -180,9 +217,9 @@ class Data_Balanced_Cover:
     Parameters
     ----------
     n_elements : int
-        The number of intervals (cover elements) to create. Must be $\ge 1$.
+        The number of intervals (cover elements) to create. Must be :math:`\ge 1`.
     percent_overlap : float
-        The fractional overlap between adjacent intervals, $0 < \text{overlap} < 1$.
+        The fractional overlap between adjacent intervals, :math:`0 < \text{overlap} < 1`.
 
     Attributes
     ----------
