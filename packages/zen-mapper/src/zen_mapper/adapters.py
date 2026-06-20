@@ -60,28 +60,23 @@ def sk_learn(
     base_clusterer: C,
     precomputed: bool | None = None,
 ) -> Clusterer[np.ndarray, C]:
-    """Wraps a scikit-learn clusterer for use with zen-mapper.
+    """Wrap a scikit-learn clusterer for use with zen-mapper.
 
     This function acts as an adapter, allowing scikit-learn's clustering
     algorithms to be integrated into the zen-mapper pipeline. Note: any
     datapoints which are considered noise by the base clusterer are ignored.
 
-    Parameters
-    ----------
-    base_clusterer : C
-        An instance of a scikit-learn compatible clustering algorithm.
-        This object should have a `fit_predict` method and a `labels_`
-        attribute after fitting, which is standard for scikit-learn
-        clusterers.
+    Args:
+        base_clusterer: An instance of a scikit-learn compatible clustering
+            algorithm. This object should have a `fit_predict` method and a
+            `labels_` attribute after fitting, which is standard for scikit-learn
+            clusterers.
 
-    precomputed : bool, optional
-        True if the scikit-learn algorithm is expecting a distance matrix. If
-        not specified the adapter attempts to detect this from
-        `base_clusterer`.
+        precomputed: True if the scikit-learn algorithm is expecting a distance
+            matrix. If not specified the adapter attempts to detect this from
+            `base_clusterer`.
 
-    Returns
-    -------
-    Clusterer[C]
+    Returns:
         An object conforming to the zen-mapper `Clusterer` protocol, which
         wraps the provided `clusterer`. This allows zen-mapper to use the
         scikit-learn clusterer's `fit_predict` methods within its pipeline. A
