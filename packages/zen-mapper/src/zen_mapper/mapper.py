@@ -24,32 +24,24 @@ def mapper(
     min_intersection: int = 1,
 ) -> MapperResult[M]:
     """
-    Constructs a simplicial complex representation of the data.
+    Construct a simplicial complex representation of the data.
 
-    Parameters
-    ----------
-    data: np.ndarray
-    projection: np.ndarray
-        The output of the lens/filter function on the data. Must have the same
-        number of elements as data.
-    cover_scheme: CoverScheme
-        For cover generation. Should be a callable object that takes a
-        numpy array and returns a list of list(indices).
-    clusterer: Clusterer
-        A callable object that takes in a dataset and returns an iterator of
-        numpy arrays which contain indices for clustered points.
-    dim: int
-        The highest dimension of the mapper complex to compute.
-    min_intersection: int
-        The minimum intersection required between clusters to make a simplex.
+    Args:
+        data: The high dimensional dataset
+        projection: The output of the lens/filter function on the data. Must have
+            the same number of elements as data.
+        cover_scheme: For cover generation. Should be a callable object that takes
+            a numpy array and returns a list of list(indices).
+        clusterer: A callable object that takes in a dataset and returns an
+            iterator of numpy arrays which contain indices for clustered points.
+        dim: The highest dimension of the mapper complex to compute.
+        min_intersection: The minimum intersection required between clusters to
+            make a simplex.
 
-    Returns
-    -------
-    MapperResult
-        An object containing:
-        - nodes: List of clusters where each cluster is a list of data indices.
-        - nerve: A complete list of simplices.
-        - cover: List of list(indices) corresponding to elements of the cover.
+    Returns:
+        The computational results of running mapper. A list of cluster, a
+        simplicial complex of those clusters, and a list of cover element
+        membership.
     """
 
     nodes = list()
