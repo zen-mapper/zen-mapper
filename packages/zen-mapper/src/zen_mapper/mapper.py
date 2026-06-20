@@ -83,20 +83,14 @@ def compute_nerve(
 ) -> Komplex:
     """Helper function to find edges of the overlapping clusters.
 
-    Parameters
-    ----------
-    nodes:
-        A dictionary with entries `{node id}:{list of ids in node}`
-    dim:
-        An optional int, specifies the maximal dimension simplex. A value of
-        `None` puts no bound on the dimension. `dim = 0` returns only the nodes
-        of the complex. Default: 1
-    min_intersection:
-        How many points of intersection two covers should have to count as
-        connected. Default: 1
-    Returns
-    -------
-    simplices:
+    Args:
+        nodes: A dictionary with entries `{node id}:{list of ids in node}`
+        dim: An optional int, specifies the maximal dimension simplex. A value
+            of `None` puts no bound on the dimension. `dim = 0` returns only the
+            nodes of the complex. Default: 1
+        min_intersection: How many points of intersection two covers should
+            have to count as connected. Default: 1
+    Returns:
         Complete list of simplices
     """
     assert dim is None or dim >= 0, "dim must be at least 0"
