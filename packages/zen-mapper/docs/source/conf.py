@@ -46,6 +46,7 @@ autodoc_typehints_format = "short"
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
+    "networkx": ("https://networkx.org/documentation/stable/", None),
 }
 
 add_module_names = False
