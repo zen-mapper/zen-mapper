@@ -1,8 +1,10 @@
 """Adapters for converting between zen-mapper types and 3rd party types"""
 
+from __future__ import annotations
+
 import logging
 from collections.abc import Collection
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -13,32 +15,29 @@ __all__ = ["to_networkx", "sk_learn"]
 
 logger = logging.getLogger("zen_mapper")
 
+if TYPE_CHECKING:
+    import networkx as nx
 
-def to_networkx(komplex: Komplex):
-    """Converts a zen-mapper komplex to a networkx graph
+
+def to_networkx(komplex: Komplex) -> nx.Graph:
+    """Convert a zen-mapper komplex to a networkx graph
 
     This function takes a `Komplex` object, which represents a simplicial complex,
     and converts it into a `networkx.Graph` object. The vertices of the `Komplex`
     become the nodes in the `networkx` graph, and the 1-simplices (edges) of
     the `Komplex` become the edges in the `networkx` graph.
 
-    Parameters
-    ----------
-    komplex : Komplex
-        The `Komplex` object to convert. This object is expected to
-        have a `vertices` attribute and support indexing for its
-        simplices (e.g., `komplex[1]` for 1-simplices).
+    Args:
+        komplex: The `Komplex` object to convert. This object is expected to
+            have a `vertices` attribute and support indexing for its simplices
+            (e.g., `komplex[1]` for 1-simplices).
 
-    Returns
-    -------
-    networkx.Graph
-        A `networkx.Graph` object representing the 0- and 1-dimensional
-        structure of the input `Komplex`.
+    Returns:
+        A graph representing the 0 and 1-dimensional structure of the input
+        `Komplex`.
 
-    Raises
-    ------
-    ImportError
-        If the `networkx` library is not installed.
+    Raises:
+        ImportError: If the `networkx` library is not installed.
     """
     try:
         import networkx as nx
