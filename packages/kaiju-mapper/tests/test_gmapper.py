@@ -6,7 +6,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.extra.numpy import arrays
 
-from kaiju_mapper.gmapper import GMapperCoverScheme, _split, _make_interval
+from kaiju_mapper.gmapper import _make_interval, _split, g_mapper_cover
 
 
 # The sklearn GaussianMixture fitting procedure generates a lot of warnings on
@@ -85,29 +85,25 @@ def test_split_clamping(
     )
 
 
-@st.composite
-def cover_scheme(draw):
-    return GMapperCoverScheme(
-        iterations=draw(st.integers(min_value=1)),
-        max_intervals=draw(st.integers(min_value=1, max_value=1_000)),
-        g_overlap=draw(
-            st.floats(
-                min_value=0,
-                max_value=1,
-                allow_nan=False,
-                exclude_min=True,
-                exclude_max=True,
-            )
+cover_scheme = st.fixed_dictionaries(
+    {
+        "iterations": st.integers(min_value=1),
+        "max_intervals": st.integers(min_value=1, max_value=1_000),
+        "g_overlap": st.floats(
+            min_value=0,
+            max_value=1,
+            allow_nan=False,
+            exclude_min=True,
+            exclude_max=True,
         ),
-        ad_threshold=draw(
-            st.floats(
-                min_value=0,
-                max_value=250,
-                allow_nan=False,
-                exclude_min=True,
-            )
+        "ad_threshold": st.floats(
+            min_value=0,
+            max_value=250,
+            allow_nan=False,
+            exclude_min=True,
         ),
-    )
+    }
+)
 
 
 # The sklearn GaussianMixture fitting procedure generates a lot of warnings on
@@ -115,16 +111,16 @@ def cover_scheme(draw):
 # in our test suite.
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @given(
-    cover_scheme(),
+    cover_scheme,
     arrays(
         dtype=float,
         shape=st.integers(min_value=1, max_value=10_000),
         elements=st.floats(allow_nan=False, allow_infinity=False),
     ),
 )
-def test_max_intervals(cover_scheme: GMapperCoverScheme, data: np.ndarray):
-    cover = cover_scheme(data)
-    assert len(cover) <= cover_scheme.max_intervals
+def test_max_intervals(cover_scheme: dict, data: np.ndarray):
+    cover = g_mapper_cover(data=data, **cover_scheme)
+    assert len(cover) <= cover_scheme["max_intervals"]
 
 
 # The sklearn GaussianMixture fitting procedure generates a lot of warnings on
@@ -132,14 +128,14 @@ def test_max_intervals(cover_scheme: GMapperCoverScheme, data: np.ndarray):
 # in our test suite.
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
 @given(
-    cover_scheme(),
+    cover_scheme,
     arrays(
         dtype=float,
         shape=st.integers(min_value=1, max_value=10_000),
         elements=st.floats(allow_nan=False, allow_infinity=False),
     ),
 )
-def test_coverage(cover_scheme: GMapperCoverScheme, data: np.ndarray):
-    cover = cover_scheme(data)
+def test_coverage(cover_scheme: dict, data: np.ndarray):
+    cover = g_mapper_cover(data=data, **cover_scheme)
     covered_points = set(chain(*cover))
     assert covered_points == set(np.arange(len(data)))

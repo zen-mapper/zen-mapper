@@ -10,7 +10,7 @@ from sklearn.mixture import GaussianMixture
 
 from kaiju_mapper.types import Seed
 
-__all__ = ("GMapperCoverScheme", "Interval")
+__all__ = ("g_mapper_cover", "Interval")
 
 
 _logger = logging.getLogger("kaiju_mapper")
@@ -33,8 +33,14 @@ class Interval:
     """Indices of the covered dataset which lie in this interval"""
 
 
-@dataclass
-class GMapperCoverScheme:
+def g_mapper_cover(
+    data: np.ndarray,
+    iterations: int,
+    max_intervals: int,
+    ad_threshold: float,
+    g_overlap: float,
+    seed: Seed | None = None,
+):
     """Adaptive cover via Gaussian mixture models
     introduced in Alvarado, et al. [#gmapper]_, G-Mapper is a scheme for
     producing a cover for Mapper inspired by the G-means clustering algorithm
@@ -49,65 +55,45 @@ class GMapperCoverScheme:
         Percival, and E. Purvine,  "G-mapper: Learning a cover in the mapper
         construction" 2025.
     .. [#gmeans] G. Hamerly, C. Elkan, "Learning the k in k-means" 2003.
+
+    Args:
+        iterations: The max number of attempted splits
+        max_intervals: The max number of intervals
+        ad_threshold: The maximum alowed Anderson-Darling score for an interval
+        g_overlap: How much split intervals should overlap
+        intervals: After fitting this contains the learned intervals
+        seed: Random source for the gaussian mixture model algorithm
     """
+    if iterations < 1:
+        raise ValueError(f"iterations must be > 0, got {iterations}")
 
-    iterations: int
-    """The max number of attempted splits"""
-    max_intervals: int
-    """The max number of intervals"""
-    ad_threshold: float
-    """The maximum alowed Anderson-Darling score for an interval"""
-    g_overlap: float
-    """How much split intervals should overlap"""
-    intervals: list[Interval]
-    """After fitting this contains the learned intervals"""
-    rng: np.random.Generator
-    """Random source for the gaussian mixture model algorithm"""
+    if max_intervals < 1:
+        raise ValueError(f"max_intervals must be > 0, got {max_intervals}")
 
-    def __init__(
-        self,
-        iterations: int,
-        max_intervals: int,
-        ad_threshold: float,
-        g_overlap: float,
-        seed: Seed | None = None,
-    ):
-        if iterations < 1:
-            raise ValueError(f"iterations must be > 0, got {iterations}")
+    if ad_threshold <= 0:
+        raise ValueError(f"ad_threshold must be > 0, got {ad_threshold}")
 
-        if max_intervals < 1:
-            raise ValueError(f"max_intervals must be > 0, got {max_intervals}")
+    if g_overlap <= 0 or g_overlap >= 1:
+        raise ValueError(f"g_overlap must be in the range (0,1), got {g_overlap}")
 
-        if ad_threshold <= 0:
-            raise ValueError(f"ad_threshold must be > 0, got {ad_threshold}")
-
-        if g_overlap <= 0 or g_overlap >= 1:
-            raise ValueError(f"g_overlap must be in the range (0,1), got {g_overlap}")
-
-        self.iterations = iterations
-        self.max_intervals = max_intervals
-        self.ad_threshold = ad_threshold
-        self.g_overlap = g_overlap
-        self.rng = np.random.default_rng(seed)
-        self.intervals = list()
-
-    def __call__(self, data: np.ndarray):
-        """Compute the cover"""
-        if data.squeeze().ndim > 1:
-            raise ValueError(
-                f"Data must be one dimensional, got matrix with shape {data.shape}"
-            )
-        self.intervals = _bfs(
-            lens=data.flatten(),
-            iterations=self.iterations,
-            max_intervals=self.max_intervals,
-            ad_threshold=self.ad_threshold,
-            g_overlap=self.g_overlap,
-            random_state=int(self.rng.integers(0, 4294967295, endpoint=True)),
-            # sklearn does not accept the new numpy generators, only ints
+    if data.squeeze().ndim > 1:
+        raise ValueError(
+            f"Data must be one dimensional, got matrix with shape {data.shape}"
         )
 
-        return [interval.members for interval in self.intervals]
+    rng = np.random.default_rng(seed)
+
+    intervals = _bfs(
+        lens=data.flatten(),
+        iterations=iterations,
+        max_intervals=max_intervals,
+        ad_threshold=ad_threshold,
+        g_overlap=g_overlap,
+        random_state=int(rng.integers(0, 4294967295, endpoint=True)),
+        # sklearn does not accept the new numpy generators, only ints
+    )
+
+    return [interval.members for interval in intervals]
 
 
 def _ad_test(data: np.ndarray) -> float:
