@@ -41,8 +41,8 @@ def rectangular_cover(
     Note:
         This is a low-level structural function that requires pre-computed
         bounding box geometries. For most use cases, you should use
-        :func:`width_balanced_cover` or :func:`data_balanced_cover` instead, which handle
-        the geometry generation automatically.
+        :func:`width_balanced_cover` or :func:`data_balanced_cover` instead,
+        which handle the geometry generation automatically.
 
     Args:
         centers: The coordinates of the centers for each hyper-rectangle. Shape
@@ -219,7 +219,8 @@ class Data_Balanced_Cover:
     n_elements : int
         The number of intervals (cover elements) to create. Must be :math:`\ge 1`.
     percent_overlap : float
-        The fractional overlap between adjacent intervals, :math:`0 < \text{overlap} < 1`.
+        The fractional overlap between adjacent intervals, :math:`0 <
+        \text{overlap} < 1`.
 
     Attributes
     ----------
