@@ -161,6 +161,19 @@ def width_balanced_cover(
     Raises:
         ValueError: If any value in `n_elements` is  less than 1.
         ValueError: If `percent_overlap` is not in the open interval (0,1)
+
+    Examples:
+        >>> data = np.array([10, 11, 12, 40, 55, 60])
+        >>> cover, meta = width_balanced_cover(2, 0.5, data)
+        >>> cover
+        [array([0, 1, 2, 3]), array([3, 4, 5])]
+        >>> [ data[e] for e in cover ]
+        [array([10, 11, 12, 40]), array([40, 55, 60])]
+        >>> meta["centers"] # The center of each interval
+        array([[26.66666667],
+               [43.33333333]])
+        >>> meta["widths"] # The width of each interval
+        array([33.33333333])
     """
 
     n_elements = np.atleast_1d(n_elements)
