@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from .adapters import sk_learn, to_networkx
