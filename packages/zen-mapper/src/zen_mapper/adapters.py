@@ -128,3 +128,70 @@ def sk_learn(
         return [np.flatnonzero(idx) for idx in c], clusterer
 
     return inner
+
+
+def sk_learn_node(
+    clusterer: C,
+    data: npt.ArrayLike,
+    elements: np.ndarray,
+    precomputed: bool | None = None,
+) -> tuple[list[np.ndarray], C]:
+    """Wrap a scikit-learn clusterer for use with zen-mapper.
+
+    This function acts as an adapter, allowing scikit-learn's clustering
+    algorithms to be integrated into the zen-mapper pipeline. Note: any
+    datapoints which are considered noise by the base clusterer are ignored.
+
+    Args:
+        clusterer: An instance of a scikit-learn compatible clustering
+            algorithm. This object should have a `fit_predict` method and a
+            `labels_` attribute after fitting, which is standard for scikit-learn
+            clusterers.
+
+        precomputed: True if the scikit-learn algorithm is expecting a distance
+            matrix. If not specified the adapter attempts to detect this from
+            `clusterer`.
+
+    Returns:
+        A tuple `(clusters, clusterer)` where `clusters` is the list of
+        computed clusters and `clusterer` is the `sklearn` object used for
+        fitting. Which allows for introspection should you want it.
+    """
+
+    try:
+        import sklearn as sk
+    except ImportError as e:
+        raise ImportError(
+            "sk-learn needs to be installed to use the sk_learn adapter"
+        ) from e
+
+    if precomputed is None:
+        precomputed = getattr(clusterer, "metric", "") == "precomputed"
+
+    _data = np.asarray(data)
+
+    _clusterer: C = sk.clone(clusterer)  # type: ignore
+
+    if precomputed:
+        masked_data = _data[np.ix_(elements, elements)]
+    else:
+        masked_data = _data[elements]
+
+    if len(masked_data) <= 1:
+        return [np.arange(len(masked_data))], _clusterer
+
+    labels = np.unique(_clusterer.fit_predict(masked_data))  # type: ignore
+
+    # -1 indicates noise, we don't do anything with it
+    if -1 in labels:
+        noise_points = labels == -1
+        logger.warning(
+            "the clusterer has labeled %d points as noise, they are being discarded",
+            noise_points.size,
+        )
+
+        labels = labels[~noise_points]
+
+    c = _clusterer.labels_ == labels[:, np.newaxis]  # type: ignore
+    ind = (np.flatnonzero(idx) for idx in c)
+    return [elements[mask] for mask in ind], _clusterer
